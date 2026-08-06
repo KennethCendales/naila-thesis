@@ -83,6 +83,26 @@
 
 ---
 
+## ADR-005 — Permisos de creación de tickets otorgados a usuario anónimo en Trac
+
+**Fecha:** 5/8/2026
+**Estado:** Aceptada
+
+**Contexto:** Por configuración por defecto, Trac restringe la creación y modificación de tickets a usuarios autenticados. El entorno `tracd` levantado para el caso de estudio no tiene un sistema de autenticación configurado (no se implementó login de usuarios).
+
+**Problema:** Al intentar crear tickets de prueba (necesarios como dataset para las pruebas del agente de IA), el sistema devolvió `Error: Forbidden — TICKET_CREATE privileges are required`.
+
+**Decisión:** Otorgar los permisos `TICKET_CREATE`, `TICKET_MODIFY` y `TICKET_VIEW` al usuario `anonymous` mediante `trac-admin permission add`, en vez de configurar un sistema de autenticación completo (usuario/contraseña).
+
+**Alternativas consideradas:**
+- Configurar autenticación real (HTTP Basic Auth o `htdigest`) con un usuario administrador dedicado — descartada por no ser prioritaria: Trac, a diferencia de osCommerce, no fue seleccionado para evaluar seguridad, y el entorno es exclusivamente de prueba/desarrollo local, sin exposición pública.
+
+**Consecuencias:**
+- El entorno de Trac queda con permisos más permisivos que un despliegue real de producción — aceptable dado que el alcance de la tesis no incluye seguridad como variable evaluada (ver definición de alcance en el objetivo general).
+- Si en fases posteriores el agente de IA necesita simular acciones "como un usuario específico" (por ejemplo, para medir trazabilidad de quién ejecuta una acción), esta decisión tendría que revisarse — anotar como posible ajuste futuro si surge esa necesidad al diseñar la capa de integración (Fase 3 del plan de trabajo).
+
+---
+
 ## Plantilla para futuras decisiones
 
 ```markdown

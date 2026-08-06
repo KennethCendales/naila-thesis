@@ -56,6 +56,30 @@
 
 ---
 
+## Día 3 — 5/8/2026
+
+**Objetivo del día:** Levantar Trac en Docker (segundo caso de estudio)
+
+**Tareas realizadas:**
+- Construcción de `Dockerfile` sobre `python:3.11-slim`, instalación de Trac vía pip
+- Creación de `docker-compose.yml` (SQLite embebido, sin contenedor de base de datos separado)
+- Inicialización del entorno con `trac-admin initenv` — proyecto nombrado "NAILA - Trac Case Study"
+- Contenedor `trac-trac-1` corriendo correctamente, interfaz web accesible en `http://localhost:8000/myproject`
+- Otorgamiento de permisos `TICKET_CREATE`, `TICKET_MODIFY`, `TICKET_VIEW` al usuario anónimo — ver Incidente #005 / ADR-005
+- Creación de 4 tickets de prueba con variedad de tipo, prioridad y estado (dataset para pruebas futuras del agente)
+
+**Decisiones tomadas:**
+- Base de datos: SQLite por defecto (no MySQL/PostgreSQL) — suficiente para el caso de estudio, sin necesidad de contenedor adicional
+- Permisos de `anonymous` ampliados en vez de configurar autenticación completa — ver ADR-005
+
+**Hallazgo relevante:** A diferencia de osCommerce (Día 2), Trac migró su motor de templates de Genshi a Jinja2 y su compatibilidad a Python 3.5+, lo que redujo significativamente la fricción de instalación — buen dato comparativo para la discusión de resultados (no todos los sistemas "legacy" tienen el mismo nivel de deuda técnica de infraestructura).
+
+**Tiempo invertido:** < 1 hora
+
+**Estado:** ✅ Completado
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown
