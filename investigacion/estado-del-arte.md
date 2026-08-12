@@ -96,6 +96,57 @@ Con estas 8 fuentes, el argumento central se sostiene con más evidencia:
 3. **La investigación sobre LLM + legacy existe pero apunta a otro problema** (recuperación/comprensión de arquitectura — ArchAgent) o a colaboración entre agentes para desarrollo (no integración con sistemas en producción).
 4. **Las métricas que planeas usar (CBO, complejidad ciclomática) tienen validación empírica de décadas, pero con limitaciones metodológicas conocidas que debes reconocer explícitamente**, no ignorar.
 
-## Pendiente para el Día 7
+---
 
-Profundizar específicamente en la fundamentación académica del patrón ACL (rastrear cita primaria de Evans, DDD) y buscar más literatura sobre el patrón Adapter en contextos de integración de sistemas.
+# Día 7 — Fundamentación académica: patrones arquitectónicos (ACL, Adapter)
+
+## 9. Evans, E. (2003) — *Domain-Driven Design: Tackling Complexity in the Heart of Software*
+
+**Aporte principal:** <cite index="37-1">Fuente original del patrón Anti-Corruption Layer — describe la situación en la que dos sistemas necesitan comunicarse y, si son incompatibles, requieren una capa delegada de comunicación para asegurar que las solicitudes y respuestas sean entendidas por ambos sistemas. El ACL se compone de tres elementos: una fachada, un adaptador y un traductor</cite>.
+
+**Limitaciones:** Es un libro de práctica de la industria (no un paper revisado por pares), aunque es la fuente primaria universalmente reconocida y citada en toda la literatura posterior sobre el patrón — su autoridad viene de haber acuñado y formalizado el concepto, no de metodología empírica.
+
+**Relación con NAILA:** **Esta es la cita académica correcta para fundamentar el "ACL" de tu arquitectura** — reemplaza cualquier referencia genérica a "documentación de Microsoft" que usamos como atajo el Día 6. Cita completa: Evans, E. (2003). *Domain-Driven Design: Tackling Complexity in the Heart of Software*. Addison-Wesley Professional.
+
+---
+
+## 10. Gamma, Helm, Johnson & Vlissides (1994) — *Design Patterns: Elements of Reusable Object-Oriented Software*
+
+**Aporte principal:** Fuente primaria del patrón Adapter (y los otros 22 patrones "Gang of Four"), clasificado como patrón estructural — <cite index="48-1">los patrones estructurales se ocupan de la composición de objetos, especificando cómo combinar elementos para lograr funcionalidad adicional (ej. adapter, composite, proxy, flyweight, facade, bridge, decorator)</cite>.
+
+**Limitaciones:** Igual que Evans (2003), es un libro fundacional de práctica, no un estudio empírico — pero es la cita obligatoria y universalmente reconocida para el patrón Adapter.
+
+**Relación con NAILA:** Cita completa: Gamma, E., Helm, R., Johnson, R., & Vlissides, J. (1994). *Design Patterns: Elements of Reusable Object-Oriented Software*. Addison-Wesley.
+
+---
+
+## 11. ⭐ "Empirical Investigation of the Impact of the Adapter Design Pattern on Software Maintainability" (IEEE)
+
+**Aporte principal — el hallazgo más importante del día:** Este es un estudio empírico que usa **exactamente tu mismo diseño metodológico**: <cite index="62-1">se aplicaron técnicas de refactorización para generar una versión sin el patrón para cuatro sistemas sujetos de estudio, luego se calcularon y compararon métricas de software para ambas versiones (la versión con el patrón y la versión sin el patrón)</cite>. <cite index="62-1">Los resultados empíricos muestran que las versiones con el patrón Adapter tienen mejores métricas de software que las versiones sin el patrón, lo cual es una señal de que el patrón Adapter impacta positivamente la mantenibilidad del software</cite>.
+
+**Limitaciones:** Solo 4 sistemas de estudio (tamaño de muestra similar al tuyo, lo cual es tanto una limitación compartida como un precedente que legitima tu propio tamaño de muestra); no se especifica si los sistemas eran legacy reales o proyectos de otro tipo — hay que revisar el paper completo para confirmarlo.
+
+**Relación con NAILA — esta es la fuente más importante encontrada hasta ahora:** Este paper es **precedente metodológico directo** de tu diseño experimental (comparar versión con patrón vs. sin patrón, usando métricas de software). Te permite argumentar que tu metodología no es inventada, sino que sigue un enfoque ya validado en la literatura — solo que tú lo aplicas específicamente al contexto de integración de agentes LLM sobre sistemas heredados, que es donde está tu aporte original. **Prioridad para el Día 8: conseguir el texto completo de este paper (IEEE Xplore) y revisar qué métricas exactas usaron**, para comparar con tu tabla de CBO/complejidad ciclomática.
+
+---
+
+## 12. Otras referencias de aplicación de Adapter en integración legacy (contexto industrial)
+
+Varias fuentes de práctica (KapreSoft, AlgoMaster, Belatrix) confirman de forma consistente el uso del patrón Adapter específicamente para integración con sistemas heredados — <cite index="60-1">el patrón Adapter resuelve esto introduciendo una clase envolvente que se sitúa entre tu sistema y el componente incompatible, traduciendo llamadas de tu interfaz hacia llamadas que el sistema legacy o de terceros entiende, sin cambiar ninguno de los dos lados</cite>. Esto es coherente con lo encontrado en osCommerce/Trac: ninguno expone una API moderna, por lo que el Adapter es la pieza que traduce las llamadas del agente hacia las funciones internas de cada sistema.
+
+**Relación con NAILA:** Confirma consenso de la industria sobre la aplicabilidad del patrón a tu escenario exacto — útil como respaldo adicional, aunque de menor peso académico que las fuentes 9, 10 y 11.
+
+---
+
+## Síntesis actualizada — justificación del patrón arquitectónico
+
+Con las fuentes del Día 6 y Día 7 combinadas, la justificación de "ACL + Adapter" para NAILA queda fundamentada en tres niveles:
+
+1. **Fuente primaria/fundacional:** Evans (2003) para ACL, Gamma et al. (1994) para Adapter — establecen el patrón formalmente.
+2. **Evidencia empírica de impacto en mantenibilidad:** El paper IEEE (#11) valida empíricamente que el patrón Adapter mejora métricas de software — precedente metodológico directo para tu propio experimento.
+3. **Vacío específico que NAILA cubre:** Ninguna de estas fuentes aplica estos patrones específicamente a la integración de **agentes de IA generativa** sobre sistemas heredados — el patrón está fundamentado, pero su aplicación a este dominio específico (agentes LLM) es donde está tu contribución original, reforzado por lo encontrado el Día 6 (Bucaioni et al. confirmando la ausencia de arquitectura de referencia para sistemas LLM-integrados).
+
+## Pendiente para el Día 8
+
+Conseguir el texto completo del paper IEEE (#11) para revisar sus métricas exactas y comparar con tu tabla de operacionalización de variables. Continuar con la fundamentación de las métricas de rendimiento (latencia, throughput) — pendiente desde el plan original.
+
