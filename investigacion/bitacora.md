@@ -80,6 +80,29 @@
 
 ---
 
+## Día 14 — Prototipo mínimo: Adapter para osCommerce (Fase 2)
+
+**Objetivo del día:** Primera implementación funcional del Adapter sobre osCommerce — hito central del proyecto.
+
+**Tareas realizadas:**
+- Configuración de entorno Python (venv) dentro de `casos-estudio/oscommerce/integracion-naila/`
+- Instalación de Ollama, descarga y verificación de Qwen3.5-9B
+- Implementación de `OsCommerceACL` — traduce entre modelo canónico NAILA y esquema real de osCommerce (tabla `products`), acceso de solo lectura vía `pymysql`
+- Implementación de `OsCommerceAdapter` — expone `list_available_products()` como tool para el agente, oculta detalles de SQL/esquema
+- Script `test_flujo_completo.py` — primera prueba end-to-end exitosa
+
+**Resultado:** ✅ **Flujo completo funcionando de punta a punta**: "muéstrame los productos disponibles" (lenguaje natural) → Qwen3.5-9B reconoce la intención → invoca `list_available_products` → Adapter delega al ACL → ACL traduce hacia SQL real sobre `products` → osCommerce devuelve datos reales de "Pola Store" (10 productos, con id/model/price/stock) → respuesta canónica limpia, sin exponer el esquema interno de osCommerce.
+
+**Decisiones tomadas:**
+- Punto de integración con osCommerce: consulta directa a MySQL en modo solo lectura (osCommerce no expone API REST nativa) — coherente con la práctica de "empezar con acceso de solo lectura" identificada en el estado del arte (Día 6, fuente #8).
+- Estructura de clases (`OsCommerceACL`, `OsCommerceAdapter`) alineada con la definición operacional de "capa de integración" del Día 12 — código propio, orientado a objetos, medible con CBO/complejidad ciclomática.
+
+**Tiempo invertido:** ~2 horas (incluye instalación de Ollama + descarga del modelo + implementación del prototipo)
+
+**Estado:** ✅ Completado — primer caso de uso funcional de NAILA
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown
