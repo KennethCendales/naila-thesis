@@ -40,11 +40,60 @@ La diferencia entre ambos es la métrica de latencia del Nivel 1. La latencia to
 
 ## Nota metodológica — limitaciones de hardware
 
-**Justificación (agregada Día 8, Fase 1):** Siguiendo la recomendación de la literatura revisada (`estado-del-arte.md`, entrada #13), todas las cifras de latencia/rendimiento reportadas en la tesis deben ir acompañadas de las especificaciones del hardware de prueba (laptop HP OMEN 16 — pendiente documentar specs exactas: CPU, RAM, GPU si aplica), y presentarse como resultados relativos/comparativos entre NAILA y el baseline ad hoc, no como cifras universales generalizables a cualquier infraestructura.
+**Justificación (agregada Día 8, Fase 1):** Siguiendo la recomendación de la literatura revisada (`estado-del-arte.md`, entrada #13), todas las cifras de latencia/rendimiento reportadas en la tesis deben ir acompañadas de las especificaciones del hardware de prueba, y presentarse como resultados relativos/comparativos entre NAILA y el baseline ad hoc, no como cifras universales generalizables a cualquier infraestructura.
+
+**Hardware de prueba (confirmado Día 12):**
+
+| Componente | Especificación |
+|---|---|
+| Equipo | PC de sobremesa (DESKTOP-134FTGN) |
+| Procesador | AMD Ryzen 7 5700G con gráficos Radeon (3.80 GHz) |
+| RAM | 48.0 GB instalados (47.8 GB utilizables) |
+| GPU | NVIDIA GeForce RTX 3060 (8 GB) |
+| Almacenamiento | 477 GB total (213 GB en uso al momento de la prueba) |
+| Sistema operativo | Windows, 64 bits, procesador x64 |
+
+Esta tabla debe incluirse tal cual (o resumida) en la sección de metodología/diseño experimental de la tesis, como parte de las condiciones de reproducibilidad del experimento.
 
 ---
 
+---
+
+## Definición operacional de "capa de integración" (Día 12, Fase 2)
+
+### Qué SÍ cuenta como capa de integración (unidad de medición del Nivel 1)
+
+- Todo el código fuente escrito por el investigador que implementa el **Adapter/API Facade** y la **Anti-Corruption Layer**, para cada versión (NAILA y ad hoc), en cada caso de estudio.
+- Debe implementarse como **código orientado a objetos**, independientemente de si el sistema legacy subyacente es procedural (osCommerce) u orientado a objetos (Trac) — esto garantiza que CBO y complejidad ciclomática sean comparables entre ambos casos de estudio, ya que se miden siempre sobre código propio con el mismo estilo, no sobre el estilo heterogéneo de cada legacy.
+- Incluye: clases adaptadoras, clases de traducción/mapeo de datos, contratos de intención estructurada (schemas/DTOs), manejo de errores específico de la integración.
+
+### Qué NO cuenta como capa de integración
+
+- El código del **Agente LLM** en sí (orquestación del modelo de lenguaje, prompts, lógica de function calling) — se considera una capa distinta, no medida en el Nivel 1.
+- El código **original del sistema legacy** (osCommerce, Trac) — permanece sin modificar por definición del proyecto, y no se mide como parte de la intervención.
+- Scripts de infraestructura (Dockerfiles, docker-compose.yml) — son configuración de entorno, no código de la arquitectura evaluada.
+
+### Convención de organización de código (para la Fase 3)
+
+Para mantener la definición aplicable de forma idéntica en ambos casos de estudio, cada caso tendrá dos carpetas de integración paralelas:
+
+```
+casos-estudio/oscommerce/
+├── integracion-naila/      ← Adapter + ACL (arquitectura propuesta)
+└── integracion-adhoc/      ← integración mínima viable sin patrón (baseline)
+
+casos-estudio/trac/
+├── integracion-naila/
+└── integracion-adhoc/
+```
+
+Todo archivo dentro de `integracion-naila/` o `integracion-adhoc/` es, por definición, parte de la capa de integración medida. Nada fuera de esas carpetas se considera parte de la intervención.
+
+### Definición de "componente afectado" (pendiente resuelto)
+
+**Unidad de medición: archivo.** Un "componente afectado" se define como un archivo de código fuente dentro de `integracion-naila/` o `integracion-adhoc/` que fue creado o modificado durante la implementación de esa versión. Se eligió "archivo" (no "clase" ni "módulo") como unidad porque es la unidad más consistente de contar entre PHP y Python sin ambigüedad adicional de qué constituye un "módulo" en cada lenguaje.
+
 ## Pendiente por definir
 
-- Definición exacta de "componente afectado" (¿archivo, clase o módulo?) — anotado desde la sesión de definición del nivel de medición, aún sin resolver formalmente.
-- Documentar specs exactas del hardware de prueba (HP OMEN 16) antes de la Fase 4.
+_(sin pendientes abiertos por ahora)_
+
