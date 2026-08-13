@@ -146,7 +146,81 @@ Con las fuentes del Día 6 y Día 7 combinadas, la justificación de "ACL + Adap
 2. **Evidencia empírica de impacto en mantenibilidad:** El paper IEEE (#11) valida empíricamente que el patrón Adapter mejora métricas de software — precedente metodológico directo para tu propio experimento.
 3. **Vacío específico que NAILA cubre:** Ninguna de estas fuentes aplica estos patrones específicamente a la integración de **agentes de IA generativa** sobre sistemas heredados — el patrón está fundamentado, pero su aplicación a este dominio específico (agentes LLM) es donde está tu contribución original, reforzado por lo encontrado el Día 6 (Bucaioni et al. confirmando la ausencia de arquitectura de referencia para sistemas LLM-integrados).
 
-## Pendiente para el Día 8
+---
 
-Conseguir el texto completo del paper IEEE (#11) para revisar sus métricas exactas y comparar con tu tabla de operacionalización de variables. Continuar con la fundamentación de las métricas de rendimiento (latencia, throughput) — pendiente desde el plan original.
+# Día 8 — Fundamentación de métricas de rendimiento (latencia, throughput)
+
+## 13. "Evaluating Prompt Injection Defenses for Educational LLM Tutors: Security-Usability-Latency Trade-offs" (2026)
+
+**Aporte principal — hallazgo metodológico clave del día:** Este paper mide el overhead de una arquitectura por capas (similar en espíritu a tu ACL + Adapter) sobre un sistema que usa LLM, y aplica una técnica de aislamiento importante: <cite index="73-1">el promedio de extremo a extremo para el adaptador completo de múltiples capas es de 2.50 ms, preservando el comportamiento interactivo mientras mejora la robustez frente al filtrado solo por expresiones regulares. Es fundamental notar que las métricas de latencia absolutas dependen fuertemente de la infraestructura de hardware subyacente, por lo que la cifra debe interpretarse como el overhead local añadido por el framework en relación con un baseline sin defensa, no como una garantía universal</cite>.
+
+**Limitaciones:** El dominio de aplicación (tutores educativos con defensas contra prompt injection) es distinto al tuyo, pero la técnica de medición es directamente aplicable.
+
+**Relación con NAILA — importante decisión metodológica que debes adoptar:** Este paper confirma la práctica correcta que ya habíamos definido intuitivamente en tu Nivel 1 de medición: **medir el overhead de la capa de integración de forma aislada, relativa a un baseline, no como cifra absoluta**. Además, remarca algo que debes incluir en tu apartado de limitaciones metodológicas: los resultados de latencia dependen del hardware usado y no deben presentarse como universales — debes ser explícito en tu tesis sobre las especificaciones de tu máquina de pruebas (tu laptop HP OMEN 16) para que los resultados sean reproducibles/interpretables correctamente.
+
+---
+
+## 14. "A Layered Security Framework Against Prompt Injection in RAG-Based Chatbots" (2026)
+
+**Aporte principal:** Otro ejemplo reciente de medición de overhead por capas en un sistema que usa LLM — <cite index="77-1">la latencia de extremo a extremo se mide desde la recepción del input del usuario hasta la entrega de la respuesta, promediada sobre 500 consultas benignas por modelo en el hardware de despliegue local. La inferencia del LLM se excluye de la medición de overhead por capa, para aislar el costo atribuible específicamente al framework</cite>.
+
+**Limitaciones:** Nuevamente, dominio distinto (seguridad de chatbots RAG), pero la metodología de medición es un precedente directo.
+
+**Relación con NAILA — refuerza la decisión anterior:** Este es el segundo paper que confirma la misma práctica: **excluir el tiempo de inferencia del LLM en sí (que no controlas ni es tu variable de interés) del overhead medido de tu capa de integración**. Esto es exactamente coherente con tu diseño de "Nivel 1: capa de integración" — debes medir el tiempo que añade tu ACL/Adapter, no el tiempo que tarda el modelo de lenguaje en pensar, ya que eso último no es parte de tu contribución arquitectónica.
+
+**Ajuste recomendado a tu tabla de métricas:** Cuando definas exactamente cómo medir "latencia" en el Nivel 1, especifica que se debe **excluir el tiempo de inferencia del LLM**, midiendo solo el tiempo entre "el adaptador recibe la intención estructurada" y "el adaptador entrega el resultado traducido desde el sistema legacy" — esto aísla tu verdadera contribución arquitectónica del tiempo de respuesta del modelo, que no controlas.
+
+---
+
+## 15. "GPU-Virt-Bench" / patrón general de medición de overhead de virtualización (2026)
+
+**Aporte principal:** Aunque de un dominio técnico distinto (virtualización de GPU), aporta un patrón metodológico reutilizable: <cite index="71-1">medir el mismo tipo de llamada tanto bajo ejecución nativa como bajo la capa que se está evaluando, y calcular la diferencia para aislar el overhead de la capa (overhead = tiempo_con_capa - tiempo_nativo)</cite>.
+
+**Limitaciones:** No es del dominio de sistemas legacy ni de IA — se cita únicamente por su valor metodológico de "medición diferencial", ampliamente generalizable.
+
+**Relación con NAILA:** Confirma el diseño de tu Nivel 2 (sistema completo antes/después) — la fórmula "overhead = con_capa − sin_capa" es exactamente la comparación entre tu arquitectura NAILA y el baseline ad hoc que ya definiste.
+
+---
+
+## Síntesis del Día 8 — ajuste metodológico importante
+
+El hallazgo más importante de hoy no es solo bibliográfico, es un **ajuste a tu diseño experimental**: al menos dos papers recientes (2026) que miden arquitecturas por capas sobre sistemas con LLM coinciden en la misma práctica — **excluir el tiempo de inferencia del LLM del overhead medido de la capa de integración**, y **declarar explícitamente las limitaciones de hardware** al reportar cifras de latencia. Vale la pena que ajustes la definición operacional de "latencia" en tu tabla de métricas (Día del sql_mode... perdón, de la tabla de operacionalización) para incorporar esta exclusión — mejora sustancialmente el rigor metodológico de tu Nivel 1.
+
+---
+
+# Día 9 — Vacíos de investigación (Research Gap)
+
+> Síntesis formal de por qué NAILA es necesaria, basada en las 15 fuentes recolectadas en los Días 6-8. Esta sección está redactada para poder trasladarse casi directamente a la tesis (con ajustes menores de estilo académico).
+
+## Vacío 1 — Ausencia de arquitectura de referencia validada empíricamente para sistemas LLM-integrados
+
+La literatura reciente reconoce explícitamente este vacío: Bucaioni et al. (2025) señalan que la ausencia de una arquitectura de referencia comúnmente aceptada dificulta el razonamiento sistemático sobre el diseño de sistemas integrados con LLM (ver fuente #1). Sin embargo, su propuesta es puramente conceptual, sin validación empírica. **NAILA cubre esta brecha aplicando y validando empíricamente un patrón arquitectónico específico (ACL + Adapter), en vez de proponer un marco teórico general sin probar.**
+
+## Vacío 2 — La investigación sobre LLM + sistemas heredados existe, pero resuelve un problema distinto
+
+Los trabajos más recientes que combinan LLM y sistemas legacy (ej. ArchAgent, fuente #2) se enfocan en **comprensión/recuperación de arquitectura** (ingeniería inversa asistida por IA), no en **integración funcional de nuevas capacidades** sobre el sistema en producción. De forma similar, la literatura de sistemas multiagente LLM para Ingeniería de Software (fuente #3) se concentra en agentes que colaboran entre sí durante el *desarrollo* de software, no en agentes que sirven como capa de interacción de usuario final sobre un sistema ya desplegado. **NAILA aborda específicamente el escenario no cubierto: un agente LLM como interfaz de interacción sobre un sistema heredado en producción, sin modificar su lógica de negocio.**
+
+## Vacío 3 — Los patrones arquitectónicos (ACL, Adapter) están fundamentados, pero no aplicados ni validados en el contexto específico de agentes de IA generativa
+
+ACL (Evans, 2003) y Adapter (Gamma et al., 1994) son patrones consolidados de más de dos décadas, con al menos un estudio empírico que valida el impacto positivo del Adapter sobre mantenibilidad (fuente #11). Sin embargo, ese estudio (como el resto de la literatura de patrones de diseño) no evalúa su aplicación al escenario específico de integrar un **agente de IA generativa basado en LLM** sobre un sistema heredado. **NAILA extiende la validación empírica de estos patrones consolidados a un dominio de aplicación nuevo y no explorado.**
+
+## Vacío 4 — Predominancia de contenido de práctica industrial sin rigor académico
+
+Una parte significativa de lo disponible sobre "integración de IA en sistemas legacy" proviene de blogs de consultoras (Prismetric, fuente #8) o documentación de proveedores (Microsoft Azure), no de investigación revisada por pares. Esto no invalida su utilidad práctica, pero **evidencia que el conocimiento sobre este problema específico está fragmentado entre práctica no validada académicamente e investigación académica que resuelve problemas adyacentes pero no idénticos.** NAILA busca cerrar esa fragmentación con un estudio riguroso y reproducible.
+
+## Vacío 5 — Ausencia de guías metodológicas específicas para medir el overhead de arquitecturas de integración con LLM
+
+Aunque encontramos precedentes recientes (2026) de medición de overhead en arquitecturas por capas sobre sistemas con LLM (fuentes #13, #14), estos provienen de dominios de seguridad (defensas contra prompt injection), no de integración con sistemas heredados. **NAILA adapta y aplica esta metodología de medición (aislar el overhead de la capa, excluyendo la inferencia del LLM) a un dominio distinto, aportando una guía metodológica replicable para investigaciones futuras similares.**
+
+---
+
+## Declaración formal del vacío de investigación (versión consolidada para la tesis)
+
+> A pesar del creciente interés académico e industrial por integrar inteligencia artificial generativa en sistemas de software, no existe, hasta la fecha de esta investigación, una arquitectura validada empíricamente que permita incorporar agentes basados en LLM como capa de interacción sobre sistemas de software heredados sin modificar su lógica de negocio central. Los trabajos existentes o bien proponen arquitecturas de referencia sin validación empírica (Bucaioni et al., 2025), o abordan problemas adyacentes como la recuperación de arquitectura legacy asistida por IA (ArchAgent) o la colaboración entre agentes durante el desarrollo de software, sin evaluar la integración de agentes como interfaz de usuario final sobre sistemas ya desplegados. Los patrones arquitectónicos que sustentan la propuesta de esta investigación (Anti-Corruption Layer, Adapter) cuentan con fundamentación teórica consolidada y al menos un precedente de validación empírica sobre mantenibilidad, pero no han sido evaluados en el contexto específico de agentes de IA generativa. Esta investigación busca cerrar dicho vacío mediante el diseño, implementación y evaluación empírica de una arquitectura no invasiva (NAILA), validada a través de casos de estudio múltiples sobre sistemas heredados reales de código abierto.
+
+## Pendiente para el Día 10
+
+Redactar la sección formal de "Justificación" del proyecto (punto 2 de la estructura de 19 puntos), integrando este vacío de investigación con el impacto práctico ya discutido en las primeras sesiones (la frase clave: "no se está mejorando osCommerce o Trac, se está proponiendo y validando una arquitectura de integración").
+
+
 
