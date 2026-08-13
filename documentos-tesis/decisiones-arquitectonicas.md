@@ -103,6 +103,31 @@
 
 ---
 
+## ADR-006 — Selección de modelo LLM: Qwen3.5-9B local vía Ollama, sin framework de orquestación
+
+**Fecha:** Día 13, Fase 2
+**Estado:** Aceptada
+
+**Contexto:** NAILA requiere un agente basado en LLM capaz de interpretar lenguaje natural y producir intenciones estructuradas (JSON) hacia la capa de integración. El hardware disponible (PC de sobremesa, RTX 3060 8GB VRAM) permite correr modelos locales de hasta ~9B parámetros con cuantización Q4_K_M.
+
+**Problema:** Elegir entre un modelo comercial vía API (Claude, GPT) y un modelo local, y definir si usar un framework de orquestación (LangChain, CrewAI) o function/tool calling nativo.
+
+**Decisión:**
+1. Modelo: **Qwen3.5-9B**, cuantización Q4_K_M, servido localmente vía Ollama.
+2. Orquestación: **tool calling nativo** de Ollama/Qwen3.5-9B, sin framework de orquestación adicional (no LangChain, no CrewAI).
+
+**Alternativas consideradas:**
+- API comercial (Claude/GPT): descartada porque introduce variabilidad de red no controlada en la medición de latencia, riesgo de cambios silenciosos del modelo entre el experimento y la defensa de tesis, y costo acumulable en cientos de pruebas — todo esto atenta contra la reproducibilidad exigida por el diseño metodológico (ver `estado-del-arte.md`, entradas #13-14).
+- Phi-4-mini: descartado por rendimiento inferior a Qwen3.5-9B específicamente en function calling y salida estructurada, según múltiples fuentes comparativas recientes (2026).
+- Framework de orquestación (LangChain): descartado por añadir una capa de abstracción adicional entre el LLM y el adaptador, dificultando medir con precisión dónde termina la inferencia del modelo y empieza la capa de integración (frontera crítica definida en la Nota metodológica del Día 8 sobre exclusión del tiempo de inferencia LLM).
+
+**Consecuencias:**
+- Requiere instalar Ollama y descargar los pesos de Qwen3.5-9B (~6-7GB) antes de la Fase 3.
+- Riesgo documentado en la literatura: los modelos pequeños tienen una brecha conocida de confiabilidad en salida estructurada (JSON parseable pero con posibles violaciones de esquema) — se debe instrumentar manejo de errores de parseo en la capa Adapter, y este esfuerzo adicional debe contabilizarse dentro de la métrica "esfuerzo de integración" si aplica de forma diferenciada entre NAILA y el baseline ad hoc.
+- Reproducibilidad alta: mismo modelo, mismos pesos, sin dependencia de disponibilidad o cambios de un proveedor externo.
+
+---
+
 ## Plantilla para futuras decisiones
 
 ```markdown
