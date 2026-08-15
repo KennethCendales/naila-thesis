@@ -128,6 +128,26 @@
 
 ---
 
+## ADR-007 — Volumen Docker con nombre para persistencia de datos de MySQL
+
+**Fecha:** Día 16 (cierre), Fase 3
+**Estado:** Aceptada
+
+**Contexto:** El `docker-compose.yml` original de osCommerce no declaraba un volumen con nombre para los datos de MySQL, lo que provocó pérdida completa de la base de datos al recrear los contenedores (ver Incidente #006).
+
+**Problema:** Sin persistencia explícita, cualquier `docker-compose down` seguido de `up` destruye todo el estado de la base de datos, haciendo el entorno de desarrollo frágil e impredecible.
+
+**Decisión:** Declarar un volumen con nombre (`db_data`) montado sobre `/var/lib/mysql` en el servicio `db`, tanto en osCommerce como (pendiente de aplicar) en Trac si su entorno de datos lo requiere de forma similar.
+
+**Alternativas consideradas:** Ninguna — esta es una práctica estándar de Docker Compose para persistencia de datos, sin trade-offs relevantes en este contexto (el volumen con nombre no tiene desventajas frente a la ausencia de volumen, solo la ventaja evidente de persistencia).
+
+**Consecuencias:**
+- Los datos ahora persisten entre reinicios de contenedores.
+- Los datos **solo** se pierden con un `docker-compose down -v` explícito (bandera `-v`) — se debe evitar usar esa bandera salvo que se desee intencionalmente reiniciar el entorno desde cero.
+- Recomendación derivada: aplicar la misma revisión a cualquier otro servicio con estado persistente que se agregue al proyecto en fases posteriores.
+
+---
+
 ## Plantilla para futuras decisiones
 
 ```markdown

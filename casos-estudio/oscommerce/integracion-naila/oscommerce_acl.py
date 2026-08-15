@@ -54,3 +54,80 @@ class OsCommerceACL:
             for row in raw_results
         ]
         return canonical_products
+
+    def search_products_by_name(self, keyword, limit=10):
+        """
+        Traduce la intención canónica 'buscar producto por nombre'
+        hacia las tablas products + products_description de osCommerce
+        (el nombre del producto vive en una tabla separada, no en 'products').
+        """
+        query = """
+            SELECT p.products_id, p.products_model, p.products_price, p.products_quantity,
+                   pd.products_name
+            FROM products p
+            JOIN products_description pd ON p.products_id = pd.products_id
+            WHERE pd.products_name LIKE %s
+              AND p.products_status = 1
+              AND pd.language_id = 1
+            ORDER BY p.products_id
+            LIMIT %s
+        """
+        connection = self._connect()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(query, (f"%{keyword}%", limit))
+                raw_results = cursor.fetchall()
+        finally:
+            connection.close()
+
+        return [
+            {
+                "id": row["products_id"],
+                "name": row["products_name"],
+                "model": row["products_model"],
+                "price": float(row["products_price"]),
+                "stock": row["products_quantity"],
+            }
+            for row in raw_results
+        ]
+
+    def get_order_status(self, order_id):
+        """
+        Traduce la intención canónica 'consultar estado de un pedido'
+        hacia las tablas orders + orders_total de osCommerce.
+        Nota: osCommerce no almacena el total en 'orders' directamente;
+        lo normaliza en 'orders_total', con una fila por concepto
+        (subtotal, envío, impuestos, total), identificada por 'class'.
+        """
+        order_query = """
+            SELECT orders_id, customers_name, date_purchased, orders_status
+            FROM orders
+            WHERE orders_id = %s
+        """
+        total_query = """
+            SELECT value
+            FROM orders_total
+            WHERE orders_id = %s AND class = 'ot_total'
+        """
+        connection = self._connect()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(order_query, (order_id,))
+                row = cursor.fetchone()
+
+                if row is None:
+                    return None
+
+                cursor.execute(total_query, (order_id,))
+                total_row = cursor.fetchone()
+        finally:
+            connection.close()
+
+        return {
+            "order_id": row["orders_id"],
+            "customer_name": row["customers_name"],
+            "date": str(row["date_purchased"]),
+            "status_id": row["orders_status"],
+            "total": float(total_row["value"]) if total_row else None,
+        }
+

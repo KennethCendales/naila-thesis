@@ -89,6 +89,53 @@ Esto sustituye el `sql_mode` estricto por defecto por uno mínimo, compatible co
 
 ---
 
+## Incidente #005 — Columna `order_total` inexistente en tabla `orders` (esquema normalizado en tabla separada)
+
+**Fecha:** Día 16, Fase 3
+**Severidad:** Baja (bloqueante para el caso de uso específico, pero de solución directa)
+
+**Síntoma:** Al ejecutar la consulta de estado de pedido, se obtuvo el error `pymysql.err.OperationalError: (1054, "Unknown column 'order_total' in 'field list'")`.
+
+**Causa raíz:** osCommerce v2.3.4 no almacena el total del pedido como columna directa en la tabla `orders`. En su lugar, normaliza los conceptos del total (subtotal, envío, impuestos, total final) en una tabla separada, `orders_total`, con una fila por concepto, distinguida por la columna `class` (ej. `ot_total` para el total final).
+
+**Solución aplicada:** Se modificó `OsCommerceACL.get_order_status()` para realizar una segunda consulta sobre `orders_total`, filtrando por `class = 'ot_total'`, y combinar el resultado con los datos de `orders`.
+
+**Tiempo perdido:** Menor — diagnóstico directo a partir del mensaje de error de MySQL.
+
+**Nota para la tesis:** Este incidente es un buen ejemplo cualitativo de **deuda de conocimiento del dominio legacy**: entender el esquema de datos de un sistema heredado no documentado formalmente requiere exploración empírica (inspeccionar tablas relacionadas), no solo lectura de documentación — un costo real de "esfuerzo de integración" que vale la pena mencionar en la discusión de resultados como parte de la experiencia cualitativa de trabajar con sistemas legacy, más allá de las métricas cuantitativas.
+
+---
+
+## Incidente #006 — Pérdida completa de base de datos por volumen Docker no persistente, y cadena de complicaciones en la recuperación
+
+**Fecha:** Día 16 (cierre), Fase 3
+**Severidad:** Alta (pérdida total de datos; cadena de 3 problemas secundarios durante la recuperación)
+
+**Síntoma inicial:** Tras ejecutar `docker-compose up` nuevamente, la tienda dejó de cargar con el error `1146 - Table 'oscommerce.configuration' doesn't exist`.
+
+**Causa raíz:** El `docker-compose.yml` de osCommerce nunca declaró un volumen con nombre para los datos de MySQL (`/var/lib/mysql`). Al recrearse el contenedor `db` (`docker-compose down` + `up`), Docker no tenía dónde persistir los datos previos, por lo que el nuevo contenedor inició con una base de datos completamente vacía. Todo el trabajo previo (tienda "Pola Store", productos, el pedido #1 usado para validar `get_order_status`) se perdió sin posibilidad de recuperación.
+
+**Cadena de problemas secundarios durante la recuperación:**
+1. Al intentar reinstalar, osCommerce no mostraba el wizard — porque `configure.php` seguía existiendo en disco (solo se perdieron los datos del contenedor de BD, no los archivos locales), y el sistema asumía que ya estaba instalado.
+2. Al acceder directamente a `/install/index.php`, apareció un error adicional: la carpeta `/install` ya no existía (se había eliminado como parte del procedimiento normal de cierre del Día 2/16) — fue necesario recuperarla clonando temporalmente una copia limpia del repositorio oficial `osCommerce/oscommerce2` (tag `v2.3.4`) y copiando solo esa carpeta.
+3. Al reintentar el wizard, apareció un error de permisos: el sistema no podía escribir en `configure.php` / `admin/configure.php` — fue necesario otorgar permisos temporales (`chmod 777`), y restringirlos de nuevo (`chmod 444`) tras completar la instalación, replicando la misma medida de seguridad aplicada en el Día 2.
+
+**Solución aplicada (definitiva):** Se agregó un volumen con nombre en el `docker-compose.yml`:
+```yaml
+db:
+  volumes:
+    - db_data:/var/lib/mysql
+volumes:
+  db_data:
+```
+Con esto, los datos de MySQL persisten incluso si los contenedores se recrean, y solo se perderían con un `docker-compose down -v` explícito (bandera `-v`).
+
+**Tiempo perdido:** Significativo — la recuperación completa (diagnóstico + 3 problemas en cascada + reinstalación completa + recreación de datos de prueba) tomó varias horas repartidas en la sesión.
+
+**Nota para la tesis:** Este incidente es un hallazgo cualitativo valioso sobre el **costo real de mantener un entorno de desarrollo reproducible para un sistema legacy**: un descuido de configuración de infraestructura (volumen no persistente) generó una cascada de complicaciones no triviales para restaurar el estado del sistema. Es evidencia concreta de que "esfuerzo de integración" en la práctica incluye no solo escribir código de adaptación, sino también gestionar correctamente el ciclo de vida del entorno legacy — un costo operativo real que rara vez se captura en métricas puramente de código (CBO, complejidad ciclomática), y que vale la pena mencionar como limitación/observación cualitativa en la discusión de resultados.
+
+---
+
 ## Plantilla para futuros incidentes
 
 ```markdown

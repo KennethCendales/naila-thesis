@@ -39,5 +39,5 @@
   define('DB_DATABASE', 'oscommerce');
   define('USE_PCONNECT', 'false');
   define('STORE_SESSIONS', 'mysql');
-  define('CFG_TIME_ZONE', 'America/New_York');
+  define('CFG_TIME_ZONE', 'UTC');
 ?>
