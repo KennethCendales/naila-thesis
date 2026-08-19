@@ -141,9 +141,29 @@
 
 **Estado comparativo:** ambas versiones (NAILA e ad hoc) resuelven ahora los mismos 3 casos de uso sobre osCommerce, listas para instrumentación de métricas en la Fase 4.
 
-**Tiempo invertido:** _(pendiente confirmar, incluye tiempo del Día 16 dedicado a recuperación de datos)_
+**Tiempo invertido:** ~1-1.5 horas
 
 **Estado:** ✅ Completado
+
+---
+
+## Día 18 — Adapter/ACL de Trac: primer caso de uso (Fase 3)
+
+**Objetivo del día:** Primera implementación funcional del Adapter/ACL sobre Trac.
+
+**Tareas realizadas:**
+- Implementación de `TracACL` — acceso de solo lectura directo al archivo SQLite de Trac (`trac.db`), traduciendo hacia el modelo canónico NAILA
+- Implementación de `TracAdapter` — expone `list_open_tickets()` como tool para el agente
+- Script `test_flujo_trac.py` — primera prueba end-to-end exitosa
+
+**Resultado:** ✅ Flujo completo funcionando de punta a punta: "muéstrame los tickets que están abiertos" → Qwen3.5-9B invoca `list_open_tickets` → Adapter delega al ACL → ACL consulta SQLite directamente → devuelve los 4 tickets de prueba (Día 3), correctamente traducidos al formato canónico, sin incidentes técnicos.
+
+**Decisiones tomadas:**
+- Punto de integración con Trac: acceso de solo lectura directo al archivo SQLite (Trac no tiene API REST habilitada por defecto) — mismo principio arquitectónico aplicado a osCommerce (Día 14), adaptado al mecanismo de persistencia de cada sistema (MySQL vs. SQLite).
+
+**Tiempo invertido:** < 1 hora
+
+**Estado:** ✅ Completado — sin incidentes
 
 ---
 
