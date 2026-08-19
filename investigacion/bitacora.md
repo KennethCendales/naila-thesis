@@ -103,6 +103,50 @@
 
 ---
 
+## Día 16 — Ampliar casos de uso de osCommerce (Fase 3)
+
+**Objetivo del día:** Agregar 2 casos de uso adicionales al Adapter/ACL de osCommerce (NAILA).
+
+**Tareas realizadas:**
+- `search_products_by_name`: búsqueda de productos por palabra clave (requiere JOIN con `products_description`)
+- `get_order_status`: consulta de estado de pedido (requiere JOIN con `orders_total`, tras corrección del Incidente #005)
+- Actualización de `TOOL_DEFINITIONS` (ahora plural, 3 herramientas) y del script de prueba para manejar múltiples casos de uso dinámicamente (`getattr` sobre el nombre de función devuelto por el agente)
+- Creación de un pedido real de prueba en "Pola Store" (usuario autenticado, productos reales) para validar `get_order_status` con datos genuinos, no simulados
+
+**Resultado:** ✅ Los 3 casos de uso funcionando correctamente de punta a punta:
+1. `list_available_products` (Día 14)
+2. `search_products_by_name` (nuevo)
+3. `get_order_status` (nuevo, validado con pedido real: order #1, Kenneth Cendales, total $114.98)
+
+**Incidentes:** Ver Incidente #005 (columna `order_total` inexistente, esquema normalizado en `orders_total`)
+
+**Tiempo invertido:** ~1.5 horas
+
+**Estado:** ✅ Completado
+
+---
+
+## Día 17 — Versión ad hoc de osCommerce (Fase 3)
+
+**Objetivo del día:** Construir el baseline ad hoc mínimo viable, resolviendo los mismos 3 casos de uso que NAILA, sin patrón arquitectónico.
+
+**Tareas realizadas:**
+- Implementación de `integracion_adhoc.py` — un solo archivo, funciones sueltas (no clases), SQL embebido directamente, conexión a BD duplicada en cada función (deliberadamente sin capa de abstracción)
+- Script `test_flujo_adhoc.py` — prueba end-to-end de los 3 casos de uso
+- Validación de los 3 casos de uso: `list_available_products`, `search_products_by_name`, `get_order_status`
+
+**Observaciones metodológicas importantes:**
+1. **Variabilidad del LLM entre ejecuciones:** para "muéstrame los productos disponibles" sin especificar cantidad, el modelo eligió `limit=15` en esta prueba, frente a `limit=10` (default) en la prueba equivalente de NAILA (Día 14) — evidencia de que el modelo decide parámetros no explícitos de forma no determinista. **Implicación para la Fase 4:** se recomienda fijar parámetros explícitos en las pruebas formales de medición de rendimiento, para evitar que la variabilidad del LLM introduzca ruido en la comparación NAILA vs. ad hoc.
+2. **Falso "bug" descartado:** la búsqueda inicial de productos con la palabra clave "DVD" devolvió 0 resultados — investigado y confirmado que es comportamiento correcto (el término "DVD" existe en `products_model`, código SKU interno, pero no en `products_name`, el nombre real del producto que consulta la búsqueda). Se validó la función con un término real ("Weapon" → "Lethal Weapon"), confirmando funcionamiento correcto. Se documenta como hallazgo cualitativo sobre la fricción entre expectativas de usuario y estructura de datos legacy.
+
+**Estado comparativo:** ambas versiones (NAILA e ad hoc) resuelven ahora los mismos 3 casos de uso sobre osCommerce, listas para instrumentación de métricas en la Fase 4.
+
+**Tiempo invertido:** _(pendiente confirmar, incluye tiempo del Día 16 dedicado a recuperación de datos)_
+
+**Estado:** ✅ Completado
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown
