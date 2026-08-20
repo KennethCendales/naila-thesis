@@ -72,6 +72,16 @@ Esta tabla debe incluirse tal cual (o resumida) en la sección de metodología/d
 - El código del **Agente LLM** en sí (orquestación del modelo de lenguaje, prompts, lógica de function calling) — se considera una capa distinta, no medida en el Nivel 1.
 - El código **original del sistema legacy** (osCommerce, Trac) — permanece sin modificar por definición del proyecto, y no se mide como parte de la intervención.
 - Scripts de infraestructura (Dockerfiles, docker-compose.yml) — son configuración de entorno, no código de la arquitectura evaluada.
+- **Scripts de prueba/validación (`test_flujo_*.py` y equivalentes)** — (aclarado Día 21) estos archivos ejercitan la capa de integración, pero no son parte de ella. Incluirlos en las métricas de CBO/complejidad/LOC distorsionaría la comparación, ya que ambas versiones (NAILA y ad hoc) requieren un arnés de prueba de complejidad similar, lo cual diluiría artificialmente la diferencia arquitectónica real entre ambas. **Se excluyen explícitamente del Nivel 1.**
+
+### Inventario de archivos medibles (Nivel 1) — actualizado Día 21
+
+| Caso de estudio | Versión | Archivos medibles (producción) | Archivos excluidos (pruebas) |
+|---|---|---|---|
+| osCommerce | NAILA | `oscommerce_acl.py`, `oscommerce_adapter.py` | `test_flujo_completo.py` |
+| osCommerce | Ad hoc | `integracion_adhoc.py` | `test_flujo_adhoc.py` |
+| Trac | NAILA | `trac_acl.py`, `trac_adapter.py` | `test_flujo_trac.py` |
+| Trac | Ad hoc | `integracion_adhoc_trac.py` | `test_flujo_adhoc_trac.py` |
 
 ### Convención de organización de código (para la Fase 3)
 
