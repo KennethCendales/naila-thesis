@@ -190,6 +190,30 @@
 
 ---
 
+## Día 20 — Versión ad hoc de Trac (Fase 3) — cierre de implementación funcional
+
+**Objetivo del día:** Construir el baseline ad hoc de Trac, resolviendo los mismos 3 casos de uso que NAILA.
+
+**Tareas realizadas:**
+- Implementación de `integracion_adhoc_trac.py` — mismo estilo deliberadamente simple que la versión ad hoc de osCommerce (Día 17): un archivo, funciones sueltas, SQL/lógica mezclada, conexión a BD duplicada en cada función
+- Script `test_flujo_adhoc_trac.py` — prueba end-to-end de los 3 casos de uso
+- Validación: resultados idénticos a la versión NAILA de Trac (4 tickets abiertos, 1 coincidencia con "login", detalles completos del ticket #1) — confirma que ambas versiones son funcionalmente equivalentes, condición necesaria para que la comparación de métricas en la Fase 4 sea válida.
+
+**Hito importante:** Con este día se completa toda la implementación funcional de la Fase 3 — **ambos casos de estudio (osCommerce, Trac) tienen ahora sus dos versiones completas (NAILA y ad hoc)**, cada una con 3 casos de uso equivalentes en complejidad.
+
+**Resumen consolidado de la Fase 3:**
+
+| Caso de estudio | NAILA | Ad hoc | Casos de uso | Incidentes |
+|---|---|---|---|---|
+| osCommerce | ✅ | ✅ | 3 (listar, buscar, estado de pedido) | #005 (esquema orders_total), #006 (pérdida de datos) |
+| Trac | ✅ | ✅ | 3 (listar, buscar, detalles) | Ninguno |
+
+**Tiempo invertido:** _(pendiente confirmar)_
+
+**Estado:** ✅ Completado — Fase 3 (implementación) cerrada
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown
