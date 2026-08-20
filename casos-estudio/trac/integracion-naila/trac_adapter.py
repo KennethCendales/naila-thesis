@@ -22,8 +22,27 @@ class TracAdapter:
             "tickets": tickets,
         }
 
+    def search_tickets_by_keyword(self, keyword, limit=20):
+        """
+        Operación expuesta al Agente LLM para búsqueda de tickets por palabra clave.
+        """
+        tickets = self.acl.search_tickets_by_keyword(keyword=keyword, limit=limit)
+        return {
+            "count": len(tickets),
+            "tickets": tickets,
+        }
 
-# Definición del "tool" en formato compatible con Ollama function/tool calling
+    def get_ticket_details(self, ticket_id):
+        """
+        Operación expuesta al Agente LLM para consultar detalles completos de un ticket.
+        """
+        ticket = self.acl.get_ticket_details(ticket_id=ticket_id)
+        if ticket is None:
+            return {"found": False, "message": f"No se encontró el ticket #{ticket_id}"}
+        return {"found": True, "ticket": ticket}
+
+
+# Definición de los "tools" en formato compatible con Ollama function/tool calling
 TOOL_DEFINITIONS = [
     {
         "type": "function",
@@ -39,6 +58,44 @@ TOOL_DEFINITIONS = [
                     }
                 },
                 "required": [],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_tickets_by_keyword",
+            "description": "Busca tickets en Trac cuyo resumen (summary) contenga una palabra clave.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "keyword": {
+                        "type": "string",
+                        "description": "Palabra clave a buscar en el resumen del ticket",
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "description": "Número máximo de resultados a devolver",
+                    },
+                },
+                "required": ["keyword"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_ticket_details",
+            "description": "Consulta los detalles completos de un ticket específico de Trac dado su número de identificación.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "ticket_id": {
+                        "type": "integer",
+                        "description": "Número de identificación del ticket",
+                    }
+                },
+                "required": ["ticket_id"],
             },
         },
     },

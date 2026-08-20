@@ -167,6 +167,29 @@
 
 ---
 
+## Día 19 — Ampliar casos de uso de Trac (Fase 3)
+
+**Objetivo del día:** Agregar 2 casos de uso adicionales al Adapter/ACL de Trac (NAILA), siguiendo el mismo patrón de complejidad que osCommerce.
+
+**Tareas realizadas:**
+- `search_tickets_by_keyword`: búsqueda de tickets por palabra clave en el resumen (`summary`)
+- `get_ticket_details`: consulta de detalles completos de un ticket (incluye `description`, `owner`, `reporter`, `component`, `milestone` — más campos que la vista de lista)
+- Actualización de `TOOL_DEFINITIONS` (3 herramientas) y script de prueba con los 3 casos de uso
+- Configuración del entorno virtual en `integracion-naila/trac` (no se había creado en el Día 18)
+
+**Resultado:** ✅ Los 3 casos de uso de Trac funcionando correctamente:
+1. `list_open_tickets` (Día 18)
+2. `search_tickets_by_keyword` (nuevo) — validado con "login", encontró el ticket #1 correctamente
+3. `get_ticket_details` (nuevo) — validado con ticket #1, maneja correctamente campos nulos (`description`, `milestone` no diligenciados en el Día 3)
+
+**Paralelismo con osCommerce:** ambos casos de estudio ahora tienen exactamente 3 casos de uso equivalentes en complejidad (listar, buscar por texto, consultar detalle por ID) — buena base comparativa para la Fase 4.
+
+**Tiempo invertido:** < 1 hora
+
+**Estado:** ✅ Completado — sin incidentes
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown

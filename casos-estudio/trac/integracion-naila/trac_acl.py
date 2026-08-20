@@ -59,3 +59,72 @@ class TracACL:
             for row in raw_results
         ]
         return canonical_tickets
+
+    def search_tickets_by_keyword(self, keyword, limit=20):
+        """
+        Traduce la intención canónica 'buscar tickets por palabra clave'
+        hacia una búsqueda LIKE sobre el campo summary de la tabla ticket.
+        """
+        query = """
+            SELECT id, summary, type, priority, status
+            FROM ticket
+            WHERE summary LIKE ?
+            ORDER BY id
+            LIMIT ?
+        """
+        connection = self._connect()
+        try:
+            cursor = connection.cursor()
+            cursor.execute(query, (f"%{keyword}%", limit))
+            columns = [desc[0] for desc in cursor.description]
+            raw_results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        finally:
+            connection.close()
+
+        return [
+            {
+                "id": row["id"],
+                "summary": row["summary"],
+                "type": row["type"],
+                "priority": row["priority"],
+                "status": row["status"],
+            }
+            for row in raw_results
+        ]
+
+    def get_ticket_details(self, ticket_id):
+        """
+        Traduce la intención canónica 'consultar detalles de un ticket'
+        hacia la tabla ticket completa (más campos que la vista de lista).
+        """
+        query = """
+            SELECT id, summary, description, type, priority, status,
+                   owner, reporter, component, milestone
+            FROM ticket
+            WHERE id = ?
+        """
+        connection = self._connect()
+        try:
+            cursor = connection.cursor()
+            cursor.execute(query, (ticket_id,))
+            columns = [desc[0] for desc in cursor.description]
+            row = cursor.fetchone()
+        finally:
+            connection.close()
+
+        if row is None:
+            return None
+
+        data = dict(zip(columns, row))
+        return {
+            "id": data["id"],
+            "summary": data["summary"],
+            "description": data["description"],
+            "type": data["type"],
+            "priority": data["priority"],
+            "status": data["status"],
+            "owner": data["owner"],
+            "reporter": data["reporter"],
+            "component": data["component"],
+            "milestone": data["milestone"],
+        }

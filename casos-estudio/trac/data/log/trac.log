@@ -110,3 +110,7 @@
 2026-08-06 02:32:30,005 Trac[main] WARNING: [172.19.0.1] HTTPNotFound: 404 Not Found (File your_project_logo.png not found), <RequestWithSession "GET '/chrome/site/your_project_logo.png'">, referrer 'http://localhost:8000/myproject/report'
 2026-08-06 02:32:39,276 Trac[chrome] WARNING: File your_project_logo.png not found in any of ['/var/trac/myproject/htdocs']
 2026-08-06 02:32:39,277 Trac[main] WARNING: [172.19.0.1] HTTPNotFound: 404 Not Found (File your_project_logo.png not found), <RequestWithSession "GET '/chrome/site/your_project_logo.png'">, referrer 'http://localhost:8000/myproject/report/1'
+2026-08-20 05:09:09,500 Trac[env] INFO: -------------------------------- environment startup [Trac 1.6] --------------------------------
+2026-08-20 05:09:11,556 Trac[env] INFO: -------------------------------- environment startup [Trac 1.6] --------------------------------
+2026-08-20 05:09:13,654 Trac[env] WARNING: [trac] base_url option not set in configuration, generated links may be incorrect
+2026-08-20 05:09:13,962 Trac[chrome] WARNING: File your_project_logo.png not found in any of ['/var/trac/myproject/htdocs']

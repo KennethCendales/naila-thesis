@@ -54,8 +54,13 @@ def procesar_mensaje(adapter, mensaje_usuario):
 
 def main():
     adapter = TracAdapter()
-    mensaje_usuario = "muéstrame los tickets que están abiertos"
-    procesar_mensaje(adapter, mensaje_usuario)
+    casos_de_prueba = [
+        "muéstrame los tickets que están abiertos",
+        "busca tickets relacionados con login",
+        "dame los detalles completos del ticket número 1",
+    ]
+    for mensaje in casos_de_prueba:
+        procesar_mensaje(adapter, mensaje)
 
 
 if __name__ == "__main__":
