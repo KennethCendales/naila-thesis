@@ -12,12 +12,20 @@ NAILA propone y valida empíricamente una arquitectura (Anti-Corruption Layer + 
 
 - ✅ Fase 0 — Preparación: ambos casos de estudio corriendo en Docker
 - ✅ Fase 1 — Estado del arte: 15 fuentes documentadas, vacío de investigación consolidado, justificación formal
-- 🔄 Fase 2 — Diseño de arquitectura: diagrama de referencia definido, modelo LLM seleccionado (Qwen3.5-9B), **primer prototipo funcional sobre osCommerce**
-- ⏳ Fase 3 — Implementación completa (ambos casos, versión NAILA + ad hoc)
-- ⏳ Fase 4 — Instrumentación de métricas
+- ✅ Fase 2 — Diseño de arquitectura: diagrama de referencia, modelo LLM (Qwen3.5-9B), primer prototipo funcional
+- ✅ Fase 3 — Implementación completa: ambos casos de estudio (osCommerce, Trac), ambas versiones (NAILA y ad hoc), 3 casos de uso equivalentes por sistema, todos validados end-to-end
+- 🔄 Fase 4 — Instrumentación de métricas (CBO, complejidad ciclomática, latencia, throughput)
 - ⏳ Fase 5 — Ejecución del experimento comparativo
 - ⏳ Fase 6 — Análisis de resultados
 - ⏳ Fase 7 — Redacción de tesis
+
+## Resumen de implementación (Fase 3)
+
+| Caso de estudio | NAILA | Ad hoc | Casos de uso | Incidentes técnicos |
+|---|---|---|---|---|
+| osCommerce v2.3.4 | ✅ | ✅ | Listar productos, buscar por nombre, estado de pedido | 2 (esquema `orders_total`, pérdida de datos por volumen no persistente) |
+| Trac | ✅ | ✅ | Listar tickets, buscar por palabra clave, detalles de ticket | 0 |
+
 
 ## Estructura del repositorio
 
@@ -28,19 +36,20 @@ naila-thesis/
 │   └── estado-del-arte.md       → 15 fuentes académicas documentadas
 ├── documentos-tesis/
 │   ├── justificacion.md
-│   ├── decisiones-arquitectonicas.md   → ADRs (6 decisiones documentadas)
-│   ├── incidentes-tecnicos.md          → 5 incidentes con causa/solución
-│   ├── operacionalizacion-variables.md → definición de métricas
-│   └── arquitectura-naila.md           → diagrama + contratos de datos
+│   ├── decisiones-arquitectonicas.md   → ADRs (7 decisiones documentadas)
+│   ├── incidentes-tecnicos.md          → 6 incidentes con causa/solución
+│   └── operacionalizacion-variables.md → definición de métricas
+├── arquitectura/
+│   └── arquitectura-naila.md    → diagrama + contratos de datos
 ├── casos-estudio/
 │   ├── oscommerce/
 │   │   ├── catalog/             → código fuente de osCommerce v2.3.4 (sin modificar)
 │   │   ├── integracion-naila/   → Adapter + ACL (arquitectura propuesta) ✅
-│   │   └── integracion-adhoc/   → baseline sin patrón (pendiente)
+│   │   └── integracion-adhoc/   → baseline sin patrón ✅
 │   └── trac/
 │       ├── data/                → entorno Trac
-│       ├── integracion-naila/   → pendiente
-│       └── integracion-adhoc/   → pendiente
+│       ├── integracion-naila/   → Adapter + ACL ✅
+│       └── integracion-adhoc/   → baseline sin patrón ✅
 └── metricas/                    → scripts y resultados de medición (Fase 4)
 ```
 
