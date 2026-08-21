@@ -3,13 +3,20 @@ NAILA - Prueba end-to-end de la version AD HOC (baseline) - Trac
 Mismo flujo conceptual que la version NAILA, pero llamando funciones sueltas
 en vez de Adapter/ACL separados.
 
+Instrumentado con medición de latencia en dos niveles (Día 23).
+
 Ejecutar: python test_flujo_adhoc_trac.py
 """
 
 import json
+import sys
+import os
 import requests
 
 import integracion_adhoc_trac as adhoc
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "metricas"))
+from timing_utils import now, ms_between, registrar_medicion
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
 MODEL_NAME = "qwen3.5:9b"
@@ -29,6 +36,8 @@ def preguntar_al_agente(mensaje_usuario):
 
 def procesar_mensaje(mensaje_usuario):
     print(f"\nUsuario: {mensaje_usuario}")
+
+    t0 = now()
     respuesta = preguntar_al_agente(mensaje_usuario)
     mensaje_modelo = respuesta.get("message", {})
 
@@ -48,9 +57,19 @@ def procesar_mensaje(mensaje_usuario):
             print(f"Función no reconocida: {function_name}")
             continue
 
+        t1 = now()
         resultado = funcion(**arguments)
+        t2 = now()
+
+        nivel1_ms = ms_between(t1, t2)
+        nivel2_ms = ms_between(t0, t2)
+
         print("[Función ad hoc devolvió]:")
         print(json.dumps(resultado, indent=2, ensure_ascii=False))
+        print(f"[Latencia] Nivel 1 (sin LLM): {nivel1_ms} ms")
+        print(f"[Latencia] Nivel 2 (con LLM): {nivel2_ms} ms")
+
+        registrar_medicion("trac", "adhoc", function_name, nivel1_ms, nivel2_ms)
 
 
 def main():

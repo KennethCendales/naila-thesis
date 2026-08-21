@@ -1,0 +1,13 @@
+timestamp,sistema,version,caso_de_uso,nivel1_ms,nivel2_ms
+2026-08-20 23:07:59,oscommerce,naila,list_available_products,31.661,6971.814
+2026-08-20 23:08:04,oscommerce,naila,search_products_by_name,26.413,5034.65
+2026-08-20 23:08:09,oscommerce,naila,get_order_status,15.243,4909.922
+2026-08-20 23:10:20,oscommerce,adhoc,list_available_products,18.958,6002.597
+2026-08-20 23:10:25,oscommerce,adhoc,search_products_by_name,12.119,5064.265
+2026-08-20 23:10:30,oscommerce,adhoc,get_order_status,21.896,5246.074
+2026-08-20 23:13:56,trac,naila,list_open_tickets,10.018,5909.38
+2026-08-20 23:14:01,trac,naila,search_tickets_by_keyword,0.908,5866.08
+2026-08-20 23:14:07,trac,naila,get_ticket_details,0.917,5937.871
+2026-08-20 23:18:15,trac,adhoc,list_open_tickets,1.091,5293.961
+2026-08-20 23:18:21,trac,adhoc,search_tickets_by_keyword,1.031,5375.157
+2026-08-20 23:18:27,trac,adhoc,get_ticket_details,0.874,5689.784
