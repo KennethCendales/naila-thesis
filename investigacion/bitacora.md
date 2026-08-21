@@ -208,9 +208,29 @@
 | osCommerce | ✅ | ✅ | 3 (listar, buscar, estado de pedido) | #005 (esquema orders_total), #006 (pérdida de datos) |
 | Trac | ✅ | ✅ | 3 (listar, buscar, detalles) | Ninguno |
 
-**Tiempo invertido:** _(pendiente confirmar)_
+**Tiempo invertido:** ~1 hora
 
 **Estado:** ✅ Completado — Fase 3 (implementación) cerrada
+
+---
+
+## Día 22 — Selección e implementación de herramientas de medición (Fase 4)
+
+**Objetivo del día:** Seleccionar y validar las herramientas para medir CBO y complejidad ciclomática sobre el código Python de NAILA.
+
+**Tareas realizadas:**
+- Investigación: confirmado que no existe herramienta estándar equivalente a CKJM (Java) para CBO en Python — se requiere script propio
+- Selección de `radon` para complejidad ciclomática y LOC (estándar de facto en Python)
+- Construcción de `cbo_calculator.py` (script propio, basado en `ast`), siguiendo la definición de Chidamber & Kemerer (1994)
+- **Iteración de mejora (v1 → v2):** la v1 solo detectaba acoplamiento en llamadas (`Call`) y anotaciones de tipo (`AnnAssign`), subestimando CBO al no capturar referencias a clases externas usadas como valores literales (ej. dentro de diccionarios). La v2 rastrea imports del archivo y detecta su uso en cualquier contexto.
+- Corrección de un bug de doble conteo en la v2 (cadenas de atributos anidadas como `pymysql.cursors.DictCursor` se contaban fragmentadas en múltiples entradas)
+- Validación exitosa sobre `oscommerce_acl.py`: CBO=2, correcto y consistente con pruebas de control
+
+**Limitación documentada:** el script no distingue automáticamente entre acoplamiento a clases vs. a funciones del mismo módulo importado (requeriría inferencia de tipos completa) — se documenta como limitación conocida en `operacionalizacion-variables.md`, aceptable porque se aplica de forma consistente entre NAILA y ad hoc, preservando la validez de la comparación relativa.
+
+**Tiempo invertido:** ~1.5-2 horas
+
+**Estado:** ✅ Completado — herramientas listas para instrumentar los 4 archivos de producción
 
 ---
 

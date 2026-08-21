@@ -103,6 +103,16 @@ Todo archivo dentro de `integracion-naila/` o `integracion-adhoc/` es, por defin
 
 **Unidad de medición: archivo.** Un "componente afectado" se define como un archivo de código fuente dentro de `integracion-naila/` o `integracion-adhoc/` que fue creado o modificado durante la implementación de esa versión. Se eligió "archivo" (no "clase" ni "módulo") como unidad porque es la unidad más consistente de contar entre PHP y Python sin ambigüedad adicional de qué constituye un "módulo" en cada lenguaje.
 
+## Nota metodológica — limitación del script propio de CBO (Día 22, Fase 4)
+
+**Herramientas seleccionadas:**
+- Complejidad ciclomática y LOC: `radon` (estándar de facto en el ecosistema Python)
+- CBO: script propio (`cbo_calculator.py`, v2), ya que no existe una herramienta estándar equivalente a CKJM (Java) para Python
+
+**Limitación documentada:** el script de CBO cuenta el uso de **cualquier símbolo importado** (módulos, clases, funciones) referenciado dentro de cada clase, siguiendo la definición de Chidamber & Kemerer (1994) de forma aproximada. No distingue automáticamente entre acoplamiento a una **clase** externa (ej. `pymysql.cursors.DictCursor`) y acoplamiento a una **función** del mismo módulo (ej. `pymysql.connect`), ya que esa distinción requeriría inferencia de tipos completa, fuera del alcance razonable de un script de análisis estático basado en AST para este proyecto.
+
+**Justificación de por qué esto no invalida la comparación:** esta limitación se aplica de forma **consistente** a los 4 archivos de producción medidos (NAILA y ad hoc, en ambos casos de estudio), por lo que, aunque los valores absolutos de CBO puedan estar sobreestimados respecto a una medición ideal, la **comparación relativa entre NAILA y ad hoc** — que es el objetivo central del diseño experimental — permanece válida, ya que el mismo criterio de medición se aplica de forma pareja en ambas versiones.
+
 ## Pendiente por definir
 
 _(sin pendientes abiertos por ahora)_
