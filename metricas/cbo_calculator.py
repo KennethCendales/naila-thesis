@@ -1,35 +1,40 @@
 """
-NAILA - Calculador de CBO (Coupling Between Objects) - v2
+NAILA - Calculador de CBO (Coupling Between Objects) - v3
 Implementa la definición de Chidamber & Kemerer (1994): CBO(c) = número de
 clases externas distintas a las que la clase c está acoplada.
 
-v2 (Día 22, ampliado): en vez de detectar acoplamiento solo en llamadas y
-anotaciones de tipo, se rastrean los imports del archivo y se detecta el uso
-de esos símbolos importados en CUALQUIER contexto dentro de la clase
-(llamadas, anotaciones, diccionarios, listas, valores por defecto, etc.).
-Esto corrige la subestimación detectada en la v1, que no capturaba
-referencias a clases externas usadas como valores literales (ej.
-pymysql.cursors.DictCursor dentro de un diccionario de configuración).
+v3 (Día 24, refinado): excluye módulos de utilidad genérica del sistema
+operativo/lenguaje (os, sys) que no representan acoplamiento de diseño real,
+sino manipulación incidental de rutas de archivos u otras operaciones de
+sistema. Se mantiene la detección de módulos de acceso a datos/persistencia
+(sqlite3, pymysql, etc.), ya que esos SÍ representan acoplamiento
+arquitectónicamente significativo hacia el sistema legacy - es justamente lo
+que esta métrica busca capturar en el contexto de NAILA.
 
-Limitación conocida y documentada: no distingue entre acoplamiento a CLASES
-específicamente vs. acoplamiento a funciones o constantes del mismo módulo
-importado - se aproxima contando cualquier símbolo importado referenciado,
-siguiendo un criterio conservador pero consistente entre todos los archivos
-medidos (NAILA y ad hoc, ambos casos de estudio).
-
-Uso: python cbo_calculator.py <ruta_del_archivo.py>
+Justificación de la exclusión (documentada en operacionalizacion-variables.md):
+Chidamber & Kemerer definieron CBO pensando en acoplamiento entre clases del
+dominio del problema, no en el uso de utilidades genéricas del lenguaje.
+Contar 'os.path.join' como acoplamiento de diseño distorsiona la comparación
+entre archivos que, por razones incidentales de implementación (ej. resolver
+una ruta de archivo SQLite vs. conectar por host/puerto a MySQL), difieren en
+su necesidad de manipular rutas, sin que eso refleje una diferencia real de
+calidad arquitectónica.
 """
 
 import ast
-import sys
+import sys as sys_module
+
+# Módulos de utilidad genérica excluidos del conteo de CBO (ver justificación arriba).
+# Nota: 'sqlite3', 'pymysql', etc. NO se excluyen - representan acoplamiento real.
+EXCLUDED_MODULES = {"os", "sys"}
 
 
 class ImportCollector(ast.NodeVisitor):
     """Primera pasada: recolecta qué módulos y símbolos se importan."""
 
     def __init__(self):
-        self.imported_modules = set()   # ej: 'pymysql' de 'import pymysql'
-        self.imported_symbols = set()   # ej: 'OsCommerceACL' de 'from x import OsCommerceACL'
+        self.imported_modules = set()
+        self.imported_symbols = set()
 
     def visit_Import(self, node):
         for alias in node.names:
@@ -45,10 +50,11 @@ class ImportCollector(ast.NodeVisitor):
 
 
 class CBOVisitor(ast.NodeVisitor):
-    """Segunda pasada: recorre cada clase y detecta uso de símbolos importados."""
+    """Segunda pasada: recorre cada clase y detecta uso de símbolos importados,
+    excluyendo módulos de utilidad genérica (EXCLUDED_MODULES)."""
 
     def __init__(self, imported_modules, imported_symbols):
-        self.imported_modules = imported_modules
+        self.imported_modules = imported_modules - EXCLUDED_MODULES
         self.imported_symbols = imported_symbols
         self.class_couplings = {}
         self.current_class = None
@@ -71,12 +77,6 @@ class CBOVisitor(ast.NodeVisitor):
             root = self._root_name(node)
             if root in self.imported_modules:
                 self.class_couplings[self.current_class].add(self._describe(node))
-        # Evita doble conteo: si node.value es a su vez un Attribute o Name,
-        # ya fue completamente capturado por _describe()/_root_name() al
-        # recorrer la cadena hacia la raíz - no hace falta re-visitarlo.
-        # Solo se continúa el recorrido si node.value es algo más complejo
-        # (ej. una llamada a función), donde SÍ podrían existir otros
-        # acoplamientos independientes por descubrir.
         if isinstance(node.value, (ast.Attribute, ast.Name)):
             return
         self.generic_visit(node)
@@ -87,7 +87,6 @@ class CBOVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _root_name(self, node):
-        """Devuelve el identificador raíz de una cadena de atributos, ej. pymysql.cursors.DictCursor -> 'pymysql'."""
         while isinstance(node, ast.Attribute):
             node = node.value
         if isinstance(node, ast.Name):
@@ -95,7 +94,6 @@ class CBOVisitor(ast.NodeVisitor):
         return None
 
     def _describe(self, node):
-        """Devuelve una representación legible de la cadena completa, ej. 'pymysql.cursors.DictCursor'."""
         parts = []
         while isinstance(node, ast.Attribute):
             parts.append(node.attr)
@@ -127,11 +125,11 @@ def calculate_cbo(filepath):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    if len(sys_module.argv) < 2:
         print("Uso: python cbo_calculator.py <ruta_del_archivo.py>")
-        sys.exit(1)
+        sys_module.exit(1)
 
-    filepath = sys.argv[1]
+    filepath = sys_module.argv[1]
     results = calculate_cbo(filepath)
 
     print(f"\nResultados de CBO para: {filepath}\n")

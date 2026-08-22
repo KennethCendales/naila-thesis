@@ -234,6 +234,50 @@
 
 ---
 
+## Día 23 — Instrumentación de latencia (Fase 4)
+
+**Objetivo del día:** Instrumentar medición de latencia en dos niveles (con/sin inferencia LLM) en los 4 scripts de prueba.
+
+**Tareas realizadas:**
+- Creación de `metricas/timing_utils.py` — utilidad compartida usando `time.perf_counter()` (reloj de alta resolución de Python, apropiado para medir intervalos cortos)
+- Instrumentación de los 4 scripts (`test_flujo_completo.py`, `test_flujo_adhoc.py`, `test_flujo_trac.py`, `test_flujo_adhoc_trac.py`) con marcas de tiempo: Nivel 1 (solo capa de integración, excluyendo inferencia LLM) y Nivel 2 (end-to-end, incluyendo inferencia LLM)
+- Registro automático de resultados en `metricas/resultados_latencia.csv`
+- Primera tanda completa de mediciones: 12 filas (4 escenarios × 3 casos de uso)
+
+**Resultados preliminares (primera corrida, no la medición formal final):**
+- Nivel 1 (osCommerce, MySQL): 12-32 ms
+- Nivel 1 (Trac, SQLite): 0.9-10 ms — **más de 10x más rápido que osCommerce**, hallazgo cuantitativo real sobre el impacto del mecanismo de persistencia del legacy en el rendimiento de la capa de integración
+- Nivel 2 (ambos sistemas): ~5-7 segundos — dominado casi por completo por la inferencia del LLM, validando empíricamente la necesidad de separar ambos niveles (Día 8)
+
+**Confirmación de la variabilidad del LLM (ya documentada en el Día 17):** de nuevo, el modelo eligió `limit=20` para "productos disponibles" sin especificar cantidad en la versión ad hoc, distinto al default de la versión NAILA — reafirma que los parámetros deben fijarse explícitamente en la medición formal de la Fase 5, no dejarse a discreción del modelo.
+
+**Incidente menor:** faltaba el entorno virtual y `requests` en `trac/integracion-adhoc` (nunca se había creado) — resuelto sin complicaciones.
+
+**Tiempo invertido:** ~1-1.5 horas
+
+**Estado:** ✅ Completado — instrumentación de latencia lista, primera tanda de datos registrada
+
+---
+
+## Día 24 — Ejecución de mediciones de mantenibilidad (Fase 4)
+
+**Objetivo del día:** Ejecutar CBO, complejidad ciclomática y LOC sobre los 6 archivos de producción.
+
+**Tareas realizadas:**
+- Ejecución de las 3 métricas sobre los 6 archivos (osCommerce NAILA×2, osCommerce ad hoc×1, Trac NAILA×2, Trac ad hoc×1)
+- **Refinamiento adicional del script de CBO (v2 → v3):** se detectó que `TracACL` mostraba CBO=6, inflado por conteo de funciones utilitarias de `os.path` (manipulación de rutas de archivo), no acoplamiento de diseño real. Se corrigió excluyendo módulos de utilidad genérica del sistema (`os`, `sys`), manteniendo módulos de acceso a datos (`sqlite3`, `pymysql`) como acoplamiento válido. Resultado corregido: CBO=1.
+- Consolidación de resultados en `metricas/resultados-mantenibilidad.md`
+
+**Hallazgo preliminar importante:** en ambos casos de estudio, la complejidad ciclomática promedio por unidad es menor en NAILA que en ad hoc (osCommerce: 1.56 vs. 2.00; Trac: 2.22 vs. 3.25) — primer hallazgo cuantitativo que respalda la hipótesis central de la tesis, consistente entre ambos sistemas legacy.
+
+**Trade-off identificado:** NAILA usa más SLOC total (2 archivos combinados) que ad hoc (1 archivo), pero distribuye la complejidad en unidades más pequeñas — un matiz importante a discutir explícitamente en los resultados finales, no ocultar.
+
+**Tiempo invertido:** ~1.5-2 horas
+
+**Estado:** ✅ Completado
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown
