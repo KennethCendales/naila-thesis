@@ -278,6 +278,26 @@
 
 ---
 
+## Día 25 — Consolidación de esfuerzo de integración (Fase 4) — CIERRE DE FASE
+
+**Objetivo del día:** Consolidar el esfuerzo de integración (horas, componentes afectados, SLOC) por versión, y cerrar toda la Fase 4.
+
+**Tareas realizadas:**
+- Recopilación de horas documentadas en Días 14, 16 (osCommerce NAILA), 17 (osCommerce ad hoc), 18-19 (Trac NAILA), 20 (Trac ad hoc)
+- Consolidación de tabla completa de esfuerzo: horas, componentes afectados (archivos), SLOC por versión
+- Declaración explícita de limitaciones metodológicas: horas auto-reportadas sin precisión de minutos, mezcla de tiempo de infraestructura (Ollama) con implementación en el Día 14, posible efecto de aprendizaje entre implementaciones sucesivas
+- Consolidación de las 3 dimensiones de la Fase 4 (rendimiento, mantenibilidad, esfuerzo) en `resultados-mantenibilidad.md`
+
+**Trade-off central identificado:** NAILA requiere más horas y más SLOC total que ad hoc en ambos casos de estudio, pero produce menor complejidad ciclomática promedio por unidad — es el trade-off que la tesis debe cuantificar y discutir explícitamente, no ocultar.
+
+**Fase 4: CERRADA.** Instrumentación completa: rendimiento (Día 23), mantenibilidad (Día 24), esfuerzo de integración (Día 25). Los datos son de una primera ejecución (n=1 por escenario) — pendiente definir en la Fase 5 si se requieren repeticiones para robustez estadística.
+
+**Tiempo invertido:** ~1 hora
+
+**Estado:** ✅ Completado — Fase 4 cerrada
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown
