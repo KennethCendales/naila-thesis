@@ -17,7 +17,7 @@ import csv
 import os
 import time
 
-CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resultados_latencia.csv")
+CSV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resultados_latencia_formal.csv")
 CSV_HEADERS = ["timestamp", "sistema", "version", "caso_de_uso", "nivel1_ms", "nivel2_ms"]
 
 

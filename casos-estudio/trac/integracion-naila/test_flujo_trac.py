@@ -72,12 +72,15 @@ def procesar_mensaje(adapter, mensaje_usuario):
 def main():
     adapter = TracAdapter()
     casos_de_prueba = [
-        "muéstrame los tickets que están abiertos",
+        "muéstrame los primeros 20 tickets que están abiertos",
         "busca tickets relacionados con login",
         "dame los detalles completos del ticket número 1",
     ]
-    for mensaje in casos_de_prueba:
-        procesar_mensaje(adapter, mensaje)
+    REPETICIONES = 10
+    for i in range(REPETICIONES):
+        print(f"\n{'='*50}\nRepetición {i+1}/{REPETICIONES}\n{'='*50}")
+        for mensaje in casos_de_prueba:
+            procesar_mensaje(adapter, mensaje)
 
 
 if __name__ == "__main__":

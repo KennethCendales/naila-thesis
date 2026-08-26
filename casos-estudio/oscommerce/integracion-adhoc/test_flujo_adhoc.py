@@ -74,12 +74,15 @@ def procesar_mensaje(mensaje_usuario):
 
 def main():
     casos_de_prueba = [
-        "muéstrame los productos disponibles",
+        "muéstrame los primeros 10 productos disponibles",
         "busca productos que tengan Weapon en el nombre",
         "¿cuál es el estado del pedido número 1?",
     ]
-    for mensaje in casos_de_prueba:
-        procesar_mensaje(mensaje)
+    REPETICIONES = 10
+    for i in range(REPETICIONES):
+        print(f"\n{'='*50}\nRepetición {i+1}/{REPETICIONES}\n{'='*50}")
+        for mensaje in casos_de_prueba:
+            procesar_mensaje(mensaje)
 
 
 if __name__ == "__main__":
