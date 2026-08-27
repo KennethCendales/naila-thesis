@@ -298,6 +298,32 @@
 
 ---
 
+## Día 26 — Ejecución del experimento comparativo formal (Fase 5)
+
+**Objetivo del día:** Diseñar protocolo de repetición, controlar variabilidad del LLM, ejecutar mediciones formales y analizar estadísticamente.
+
+**Tareas realizadas:**
+- Decisión de protocolo: 10 repeticiones por caso de uso, con parámetros de cantidad fijados explícitamente en los mensajes (ej. "los primeros 10 productos") para controlar la variabilidad no determinista del LLM documentada en Días 17, 20, 23
+- Instrumentación de los 4 scripts de prueba con bucle de repetición ×10
+- Respaldo del CSV piloto (`resultados_latencia_piloto.csv`) y creación de uno nuevo para la medición formal (`resultados_latencia_formal.csv`)
+- Ejecución de las 4 corridas completas: 120 mediciones totales (10 repeticiones × 3 casos × 4 escenarios)
+- Análisis estadístico consolidado (media, desviación estándar) por escenario y nivel
+
+**Resultado principal — trade-off central cuantificado con estadística real:**
+- **Nivel 1:** ad hoc es más rápido que NAILA en ambos casos de estudio (osCommerce: 18.10ms vs. 23.17ms; Trac: 0.86ms vs. 0.85-1.16ms) — costo esperado de la separación de responsabilidades (indirección Adapter→ACL)
+- **Nivel 2:** sin diferencia significativa entre NAILA y ad hoc — dominado por la variabilidad de inferencia del LLM (desviaciones estándar de ~600-670ms superan la diferencia entre versiones)
+- Confirmado con datos robustos (n=30): Trac (SQLite) es 15-20x más rápido que osCommerce (MySQL) en Nivel 1, independientemente de la versión
+
+**Nota metodológica:** se identificó y documentó un outlier de arranque en frío en Trac NAILA (10.359 ms en la primera repetición) — reportado tanto incluido como excluido, con transparencia sobre su tratamiento.
+
+**Síntesis del trade-off (Fases 4+5 combinadas):** NAILA ofrece mejor mantenibilidad (menor complejidad ciclomática) a cambio de mayor esfuerzo de implementación y un costo marginal de rendimiento en Nivel 1 — ninguna versión es objetivamente superior en todas las dimensiones, lo cual es precisamente el hallazgo central y honesto de la tesis.
+
+**Tiempo invertido:** _(pendiente confirmar)_
+
+**Estado:** ✅ Completado — Fase 5 (experimento comparativo) cerrada
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown

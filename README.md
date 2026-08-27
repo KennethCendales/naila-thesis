@@ -14,9 +14,9 @@ NAILA propone y valida empíricamente una arquitectura (Anti-Corruption Layer + 
 - ✅ Fase 1 — Estado del arte: 15 fuentes documentadas, vacío de investigación consolidado, justificación formal
 - ✅ Fase 2 — Diseño de arquitectura: diagrama de referencia, modelo LLM (Qwen3.5-9B), primer prototipo funcional
 - ✅ Fase 3 — Implementación completa: ambos casos de estudio (osCommerce, Trac), ambas versiones (NAILA y ad hoc), 3 casos de uso equivalentes por sistema, todos validados end-to-end
-- ✅ Fase 4 — Instrumentación de métricas: rendimiento (latencia Nivel 1/2), mantenibilidad (CBO, complejidad ciclomática), esfuerzo de integración — primer hallazgo cuantitativo: NAILA reduce complejidad ciclomática promedio en ambos casos de estudio
-- 🔄 Fase 5 — Ejecución del experimento comparativo (definir si se requieren repeticiones para robustez estadística)
-- ⏳ Fase 6 — Análisis de resultados
+- ✅ Fase 4 — Instrumentación de métricas: rendimiento (latencia Nivel 1/2), mantenibilidad (CBO, complejidad ciclomática), esfuerzo de integración
+- ✅ Fase 5 — Experimento comparativo formal: 120 mediciones (10 repeticiones × 3 casos × 4 escenarios), análisis estadístico, **trade-off central cuantificado**: NAILA mejora mantenibilidad a cambio de mayor esfuerzo y costo marginal de rendimiento en Nivel 1
+- 🔄 Fase 6 — Análisis de resultados y discusión
 - ⏳ Fase 7 — Redacción de tesis
 
 ## Resumen de implementación (Fase 3)
