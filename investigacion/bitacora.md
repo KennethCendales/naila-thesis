@@ -318,9 +318,30 @@
 
 **Síntesis del trade-off (Fases 4+5 combinadas):** NAILA ofrece mejor mantenibilidad (menor complejidad ciclomática) a cambio de mayor esfuerzo de implementación y un costo marginal de rendimiento en Nivel 1 — ninguna versión es objetivamente superior en todas las dimensiones, lo cual es precisamente el hallazgo central y honesto de la tesis.
 
-**Tiempo invertido:** _(pendiente confirmar)_
+**Tiempo invertido:** ~1.5-2 horas
 
 **Estado:** ✅ Completado — Fase 5 (experimento comparativo) cerrada
+
+---
+
+## Extensión — Demo funcional de NAILA (posterior al Día 28, Fase 6)
+
+**Contexto:** A solicitud explícita de dar a la tesis "algo tangible que se pueda implementar", se construyó un demo funcional (chat web conectado a NAILA sobre osCommerce), como evidencia de aplicabilidad práctica — sin interrumpir el cierre pendiente de la Fase 6 (Día 29: Limitaciones, aún no realizado).
+
+**Decisión de alcance importante:** se descartó explícitamente la opción de realizar pruebas piloto con empresas reales en esta etapa (implicaría aprobación ética, acuerdos externos, y un cronograma de investigación distinto) — esa línea queda reservada para el roadmap extendido del año, no para esta entrega. Ver ADR-008.
+
+**Tareas realizadas:**
+- Backend (`demo/backend/app.py`, FastAPI) y frontend (`demo/frontend/index.html`) construidos como archivos nuevos, reutilizando sin modificar `oscommerce_adapter.py`/`oscommerce_acl.py` ya medidos empíricamente (Fases 4-5) — sin impacto en ningún resultado ya reportado.
+- Flujo de dos turnos con Ollama: primera llamada decide la herramienta, segunda llamada redacta la respuesta final en lenguaje natural (no el JSON crudo de los scripts de prueba).
+- Catálogo real embebido en la tienda simulada (`GET /products`), reutilizando `search_products_by_name` con keyword vacío como técnica para obtener todos los productos con nombre real incluido.
+- Enriquecimiento de resultados con el link real a la página del producto (`product_info.php?products_id=N`, patrón confirmado directamente en la instalación de osCommerce).
+- Ajuste del prompt del sistema para: respuestas breves, formato de lista con viñetas (no tablas), nombre real del producto oculto detrás del link en formato Markdown (no código SKU, no URL visible).
+- Pulido de interfaz: avatares, indicador de escritura animado, animación de entrada de mensajes, bloqueo de input mientras se espera respuesta, badge de atribución a la investigación ("Impulsado por la arquitectura NAILA — Investigación en Ingeniería de Software, UMB").
+- **Incidente corregido:** `TypeError: string indices must be integers` en `obtener_mapa_nombres()` — se iteraba sobre el diccionario completo de respuesta (`{"count":..., "products":[...]}`) en vez de sobre `resultado["products"]`. Corregido y validado.
+
+**Refuerzo metodológico importante:** se agregó una sección explícita a `discusion-tesis.md` (Sección 8) distinguiendo la contribución científica (patrón arquitectónico validado empíricamente + cuantificación del trade-off) de la aplicación demostrativa (el chat en sí, que es una capacidad comercialmente común) — necesario para que el demo no se preste a que un jurado confunda "construir un chatbot" con la novedad real de la investigación.
+
+**Estado:** ✅ Demo funcional completo — catálogo real clicable, chat con links ocultos y nombres reales, interfaz pulida. Pendiente retomar Fase 6 (Día 29: Limitaciones) en la próxima sesión.
 
 ---
 

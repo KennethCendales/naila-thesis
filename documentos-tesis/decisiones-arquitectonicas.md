@@ -148,6 +148,28 @@
 
 ---
 
+## ADR-008 — Alcance del demo funcional: prueba de concepto local, no piloto en entorno real
+
+**Fecha:** Extensión posterior al Día 28, Fase 6
+**Estado:** Aceptada
+
+**Contexto:** Surgió la propuesta de que NAILA se implemente "en cualquier página web con sistema legacy" y se valide con pruebas reales en empresas, como forma de dar a la tesis un componente tangible e implementable.
+
+**Problema:** Ejecutar un piloto con una empresa real dentro del cronograma de cierre de la tesis (Fases 6-7) implica riesgos serios de alcance: aprobación de comité de ética, acuerdos de confidencialidad, tiempo de instalación en infraestructura ajena, y un cronograma que fácilmente se extiende varios meses — incompatible con el objetivo de tener una tesis completa y defendible en el corto plazo.
+
+**Decisión:** Construir un demo funcional **local** (chat web conectado a NAILA sobre osCommerce, corriendo en la máquina del investigador) como evidencia de aplicabilidad práctica del hallazgo de investigación, reservando explícitamente el piloto con una organización real para el roadmap extendido posterior a la entrega de la tesis (el estudiante cuenta con aproximadamente un año adicional antes de la sustentación final).
+
+**Alternativas consideradas:**
+- Piloto real inmediato: descartado por el riesgo de cronograma señalado arriba.
+- No construir ningún demo: descartado porque el estudiante solicitó explícitamente un entregable tangible, y el demo aporta evidencia de aplicabilidad sin el riesgo de un piloto externo.
+
+**Consecuencias:**
+- El demo debe presentarse y documentarse siempre como "prueba de concepto local", nunca como "validado en producción" — cualquier redacción de tesis que sugiera lo contrario sería una tergiversación del alcance real logrado.
+- Se agregó una sección explícita en la Discusión de la tesis (`discusion-tesis.md`, Sección 8) para prevenir que el demo se confunda con la contribución científica central.
+- El roadmap extendido (piloto real, empaquetado como librería publicada, tercer caso de estudio) queda pendiente como trabajo posterior a la entrega, no como parte de esta tesis.
+
+---
+
 ## Plantilla para futuras decisiones
 
 ```markdown
