@@ -345,6 +345,22 @@
 
 ---
 
+## Fase 7 (continuación) — Herramienta de políticas + rediseño a buscador central
+
+**Objetivo del día:** Ampliar el rango de preguntas que el asistente puede responder sin alucinar, y rediseñar el frontend para que NAILA sea la interacción principal del sitio, no un widget flotante secundario.
+
+**Tareas realizadas:**
+- Nueva herramienta `consultar_politicas_tienda` (envíos, devoluciones, horario, descuentos, contacto, pago), respaldada por datos reales de un catálogo de políticas de demo — evita que el modelo invente información ante preguntas fuera de las 3 herramientas originales, manteniendo la disciplina arquitectónica de "todo pasa por una herramienta real", no por improvisación del LLM.
+- Refuerzo del prompt del sistema: honestidad explícita cuando ninguna herramienta cubre la pregunta ("dilo, no inventes").
+- **Rediseño completo del frontend**: NAILA pasó de ser un widget de chat flotante (esquina inferior derecha) a ser el buscador central de la página — patrón de interacción principal, con chips de sugerencia, hilo de conversación integrado visualmente en la página (no en un panel superpuesto), y navegación superior clicable (Catálogo, Pedidos, Soporte) que complementa la búsqueda sin competir con ella.
+- Validado manualmente por el usuario: preguntas dentro/fuera de alcance, casos límite (pedidos inexistentes), formato de respuesta.
+
+**Pendiente para la próxima sesión:** Segundo rediseño visual — el usuario compartió una referencia de estética "vidrio líquido / cromo oscuro" (tendencia actual en productos de IA) para explorar si se adopta como nueva identidad visual del demo, o se mantiene la identidad actual ("Pola Store" retro-tech, paleta papel/tinta/ámbar) con mejoras de pulido. Decisión de identidad visual pendiente de discutir antes de implementar.
+
+**Estado:** ✅ Funcionalidad de hoy completa y validada — pendiente decisión de diseño visual para la próxima sesión.
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown
