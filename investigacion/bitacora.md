@@ -355,9 +355,9 @@
 - **Rediseño completo del frontend**: NAILA pasó de ser un widget de chat flotante (esquina inferior derecha) a ser el buscador central de la página — patrón de interacción principal, con chips de sugerencia, hilo de conversación integrado visualmente en la página (no en un panel superpuesto), y navegación superior clicable (Catálogo, Pedidos, Soporte) que complementa la búsqueda sin competir con ella.
 - Validado manualmente por el usuario: preguntas dentro/fuera de alcance, casos límite (pedidos inexistentes), formato de respuesta.
 
-**Pendiente para la próxima sesión:** Segundo rediseño visual — el usuario compartió una referencia de estética "vidrio líquido / cromo oscuro" (tendencia actual en productos de IA) para explorar si se adopta como nueva identidad visual del demo, o se mantiene la identidad actual ("Pola Store" retro-tech, paleta papel/tinta/ámbar) con mejoras de pulido. Decisión de identidad visual pendiente de discutir antes de implementar.
+**Actualización:** Se implementó el rediseño visual completo — identidad oscura tipo "vidrio/cromo" (glassmorphism), con manchas de luz difusas de fondo (CSS puro, sin imágenes), acento ámbar con resplandor, y NAILA como protagonista explícito del headline ("Dime qué buscas, NAILA lo encuentra"). Navegación funcional (Catálogo/Pedidos/Soporte) preservada. Pendiente: ajustes puntuales de diseño a definir en la próxima sesión.
 
-**Estado:** ✅ Funcionalidad de hoy completa y validada — pendiente decisión de diseño visual para la próxima sesión.
+**Estado:** ✅ Funcionalidad completa (herramienta de políticas + buscador central) + primer rediseño visual completo. Pendientes ajustes finos de diseño.
 
 ---
 
