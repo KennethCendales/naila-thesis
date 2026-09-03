@@ -16,7 +16,8 @@ import sys
 import os
 import json
 import requests
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -29,6 +30,7 @@ from oscommerce_adapter import OsCommerceAdapter, TOOL_DEFINITIONS
 OLLAMA_URL = "http://localhost:11434/api/chat"
 MODEL_NAME = "qwen3.5:9b"
 STORE_BASE_URL = "http://localhost:8080"
+OLLAMA_TIMEOUT = 40  # segundos
 
 app = FastAPI(title="NAILA Chat Demo")
 
@@ -40,6 +42,75 @@ app.add_middleware(
 )
 
 adapter = OsCommerceAdapter()
+
+# --- Herramienta adicional (capa de demo, no forma parte de lo medido empíricamente) ---
+# Permite responder preguntas frecuentes de la tienda con datos reales de un
+# catálogo de políticas, en vez de dejar que el modelo improvise una respuesta.
+POLITICAS_TIENDA = {
+    "envios": "Pola Store realiza envíos nacionales en 3-5 días hábiles. Por el momento no se realizan envíos internacionales.",
+    "devoluciones": "Aceptamos devoluciones dentro de los 15 días posteriores a la compra, con el producto en su empaque original.",
+    "horario": "Atención al cliente: lunes a viernes, de 8:00 a.m. a 6:00 p.m.",
+    "descuentos": "Los descuentos vigentes se muestran directamente en la página de cada producto. No manejamos descuentos por volumen actualmente.",
+    "contacto": "Puedes escribir por este mismo chat o al correo soporte@polastore.demo.",
+    "pago": "Aceptamos tarjetas de crédito/débito y pago contra entrega en ciudades principales.",
+}
+
+FAQ_TOOL_DEFINITION = {
+    "type": "function",
+    "function": {
+        "name": "consultar_politicas_tienda",
+        "description": (
+            "Consulta políticas generales de la tienda: envíos, devoluciones, "
+            "horario de atención, descuentos, contacto o métodos de pago."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tema": {
+                    "type": "string",
+                    "description": "Uno de: envios, devoluciones, horario, descuentos, contacto, pago",
+                }
+            },
+            "required": ["tema"],
+        },
+    },
+}
+
+
+def consultar_politicas_tienda(tema):
+    clave = (tema or "").lower().strip()
+    respuesta = POLITICAS_TIENDA.get(clave)
+    if respuesta is None:
+        return {
+            "encontrado": False,
+            "mensaje": "No tengo información registrada sobre ese tema específico. "
+            "Puedo ayudarte con envíos, devoluciones, horario, descuentos, contacto o pagos.",
+        }
+    return {"encontrado": True, "tema": clave, "respuesta": respuesta}
+
+
+TODAS_LAS_HERRAMIENTAS = TOOL_DEFINITIONS + [FAQ_TOOL_DEFINITION]
+
+
+class RespuestaAmigableError(Exception):
+    """Error controlado: el mensaje ya es seguro y amigable para mostrar al usuario final."""
+    def __init__(self, mensaje, status_code=503):
+        self.mensaje = mensaje
+        self.status_code = status_code
+
+
+@app.exception_handler(RespuestaAmigableError)
+async def manejar_error_amigable(request: Request, exc: RespuestaAmigableError):
+    return JSONResponse(status_code=exc.status_code, content={"reply": exc.mensaje, "error": True})
+
+
+@app.exception_handler(Exception)
+async def manejar_error_inesperado(request: Request, exc: Exception):
+    # Nunca exponer el traceback real al usuario final; queda igual visible en la consola de uvicorn.
+    return JSONResponse(
+        status_code=500,
+        content={"reply": "Ocurrió un error inesperado en el servidor. Por favor intenta de nuevo.", "error": True},
+    )
 
 
 class ChatRequest(BaseModel):
@@ -77,10 +148,23 @@ def enriquecer_con_url(resultado):
 def llamar_ollama(messages, incluir_tools=True):
     payload = {"model": MODEL_NAME, "messages": messages, "stream": False}
     if incluir_tools:
-        payload["tools"] = TOOL_DEFINITIONS
-    response = requests.post(OLLAMA_URL, json=payload)
-    response.raise_for_status()
-    return response.json()
+        payload["tools"] = TODAS_LAS_HERRAMIENTAS
+    try:
+        response = requests.post(OLLAMA_URL, json=payload, timeout=OLLAMA_TIMEOUT)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.ConnectionError:
+        raise RespuestaAmigableError(
+            "El asistente no está disponible en este momento. Verifica que Ollama esté corriendo."
+        )
+    except requests.exceptions.Timeout:
+        raise RespuestaAmigableError(
+            "El asistente está tardando más de lo normal en responder. Intenta de nuevo en unos segundos."
+        )
+    except requests.exceptions.HTTPError as e:
+        raise RespuestaAmigableError(
+            f"El asistente respondió con un error inesperado ({e.response.status_code}). Intenta de nuevo."
+        )
 
 
 @app.post("/chat")
@@ -96,7 +180,11 @@ def chat(request: ChatRequest):
                 "detrás del NOMBRE REAL del producto (campo 'name'), usando formato Markdown: "
                 "[nombre](url). NUNCA uses el campo 'model' (es un código SKU interno, no un nombre "
                 "presentable al usuario).\n"
-                "4. No inventes información que no provenga de las herramientas.\n\n"
+                "4. Para preguntas sobre envíos, devoluciones, horario, descuentos, contacto o pagos, "
+                "usa SIEMPRE la herramienta consultar_politicas_tienda - nunca inventes esta información.\n"
+                "5. Si una pregunta no puede responderse con ninguna herramienta disponible, dilo "
+                "honestamente y de forma breve (ej. 'no tengo esa información disponible'). NUNCA "
+                "inventes datos que no provengan de una herramienta.\n\n"
                 "Ejemplo exacto del formato esperado para listar productos:\n"
                 "En Pola Store tenemos 3 productos:\n"
                 "- [Matrox G200 MMS](http://localhost:8080/product_info.php?products_id=1)\n"
@@ -120,13 +208,22 @@ def chat(request: ChatRequest):
     for call in tool_calls:
         function_name = call["function"]["name"]
         arguments = call["function"].get("arguments", {})
-        metodo = getattr(adapter, function_name, None)
 
-        if metodo is None:
-            resultado = {"error": f"Herramienta no reconocida: {function_name}"}
+        if function_name == "consultar_politicas_tienda":
+            resultado = consultar_politicas_tienda(**arguments)
         else:
-            resultado = metodo(**arguments)
-            resultado = enriquecer_con_url(resultado)
+            metodo = getattr(adapter, function_name, None)
+            if metodo is None:
+                resultado = {"error": f"Herramienta no reconocida: {function_name}"}
+            else:
+                try:
+                    resultado = metodo(**arguments)
+                    resultado = enriquecer_con_url(resultado)
+                except Exception:
+                    resultado = {
+                        "error": "No se pudo consultar la tienda en este momento. "
+                        "Verifica que osCommerce y su base de datos estén disponibles."
+                    }
 
         messages.append({"role": "tool", "content": json.dumps(resultado, ensure_ascii=False)})
 
@@ -141,9 +238,15 @@ def get_products(limit: int = 8):
     Reutiliza search_products_by_name con keyword vacío (coincide con todos
     los nombres vía LIKE '%%'), sin modificar el Adapter medido.
     """
-    resultado = adapter.search_products_by_name(keyword="", limit=limit)
-    resultado = enriquecer_con_url(resultado)
-    return resultado
+    try:
+        resultado = adapter.search_products_by_name(keyword="", limit=limit)
+        resultado = enriquecer_con_url(resultado)
+        return resultado
+    except Exception:
+        return JSONResponse(
+            status_code=503,
+            content={"count": 0, "products": [], "error": "No se pudo conectar con osCommerce."},
+        )
 
 
 @app.get("/health")

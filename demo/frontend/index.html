@@ -16,173 +16,120 @@
     --mono: 'Courier New', Consolas, monospace;
   }
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
     margin: 0;
     background: var(--paper);
     color: var(--ink);
     font-family: Georgia, 'Times New Roman', serif;
   }
+
   header {
     border-bottom: 3px solid var(--ink);
-    padding: 28px 48px 20px;
+    padding: 22px 48px;
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-  }
-  header .brand {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-  }
-  header .brand span { color: var(--amber-deep); }
-  header nav { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); letter-spacing: 1px; }
-  header nav span { margin-left: 24px; }
-
-  main { max-width: 1040px; margin: 0 auto; padding: 56px 48px 120px; }
-  .hero {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 40px;
     align-items: center;
-    margin-bottom: 64px;
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    z-index: 50;
   }
-  .hero h1 {
-    font-size: 46px;
-    line-height: 1.08;
-    margin: 0 0 18px;
+  header .brand { font-family: var(--mono); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  header .brand span { color: var(--amber-deep); }
+  header nav { display: flex; gap: 28px; }
+  header nav button {
+    font-family: var(--mono); font-size: 12.5px; letter-spacing: 1px; color: var(--ink-soft);
+    background: none; border: none; cursor: pointer; padding: 4px 0;
+    border-bottom: 2px solid transparent;
   }
-  .hero p { color: var(--ink-soft); font-size: 17px; line-height: 1.6; max-width: 46ch; }
-  .tag {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 1.5px;
-    color: var(--amber-deep);
-    border: 1px solid var(--amber-deep);
-    padding: 4px 10px;
-    margin-bottom: 18px;
-  }
-  .hero-panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    padding: 24px;
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--ink-soft);
-    line-height: 1.8;
-  }
-  .hero-panel .row { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--line); padding: 6px 0; }
-  .hero-panel .row:last-child { border-bottom: none; }
+  header nav button:hover { color: var(--ink); border-bottom-color: var(--amber-deep); }
 
-  .section-label {
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 2px;
-    color: var(--amber-deep);
-    margin-bottom: 12px;
-  }
-  h2 { font-size: 26px; margin: 0 0 28px; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-  }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    padding: 18px;
-    transition: border-color 0.15s, transform 0.1s;
-    display: block;
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-  }
-  .card:hover { border-color: var(--ink); transform: translateY(-2px); }
-  .card .sku { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
-  .card h3 { font-size: 16px; margin: 8px 0 6px; }
-  .card .price { font-family: var(--mono); font-weight: 700; color: var(--amber-deep); }
-  .card .goto { font-family: var(--mono); font-size: 10px; color: var(--ink-soft); margin-top: 8px; letter-spacing: 0.5px; }
-  .grid .loading { grid-column: 1 / -1; font-family: var(--mono); color: var(--ink-soft); font-size: 13px; }
-
-  footer {
-    border-top: 3px solid var(--ink);
-    padding: 24px 48px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-soft);
+  .ask-hero {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 64px 32px 40px;
     text-align: center;
   }
+  .ask-hero .tag {
+    display: inline-block;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 1.5px;
+    color: var(--amber-deep); border: 1px solid var(--amber-deep);
+    padding: 4px 10px; margin-bottom: 20px;
+  }
+  .ask-hero h1 { font-size: 36px; line-height: 1.2; margin: 0 0 12px; }
+  .ask-hero p.sub { color: var(--ink-soft); font-size: 15px; margin: 0 0 32px; }
 
-  /* --- Widget de chat NAILA --- */
-  #naila-launcher {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    font-family: var(--mono);
-    font-size: 22px;
-    cursor: pointer;
-    box-shadow: 0 8px 24px rgba(22, 33, 58, 0.35);
-    z-index: 1000;
-  }
-  #naila-panel {
-    position: fixed;
-    bottom: 100px;
-    right: 28px;
-    width: 380px;
-    height: 500px;
-    background: var(--panel);
-    border: 1px solid var(--ink);
-    display: none;
-    flex-direction: column;
-    z-index: 1000;
-    box-shadow: 0 16px 48px rgba(22, 33, 58, 0.25);
-  }
-  #naila-panel.open { display: flex; }
-  #naila-header {
-    background: var(--ink);
-    color: var(--paper);
-    padding: 14px 16px;
-    font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 0.5px;
+  #ask-form {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    background: var(--panel);
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    padding: 6px 6px 6px 22px;
+    box-shadow: 0 10px 30px rgba(22, 33, 58, 0.10);
   }
-  #naila-header .dot { width: 8px; height: 8px; border-radius: 50%; background: #6fcf97; display: inline-block; margin-right: 8px; }
-  #naila-messages {
-    flex: 1;
+  #ask-form .icon-n {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: white;
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 12px; flex-shrink: 0;
+  }
+  #ask-input {
+    flex: 1; border: none; outline: none; font-family: Georgia, serif;
+    font-size: 16px; padding: 12px 4px; background: transparent; color: var(--ink);
+  }
+  #ask-input::placeholder { color: #9a9584; }
+  #ask-submit {
+    border: none; background: var(--amber-deep); color: white;
+    font-family: var(--mono); font-size: 12px; letter-spacing: 0.5px;
+    padding: 12px 22px; border-radius: 999px; cursor: pointer;
+  }
+  #ask-submit:disabled { opacity: 0.5; cursor: default; }
+
+  .suggestions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 18px; }
+  .chip {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft);
+    border: 1px solid var(--line); background: var(--panel);
+    padding: 7px 14px; border-radius: 999px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--ink); color: var(--ink); }
+
+  #conversation-wrap { max-width: 780px; margin: 0 auto; padding: 0 32px; display: none; }
+  #conversation-wrap.active { display: block; }
+  #conversation {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px;
+    max-height: 420px;
     overflow-y: auto;
-    padding: 16px;
-    font-family: Georgia, serif;
-    font-size: 14px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
+    margin-bottom: 48px;
   }
-  .msg-row { display: flex; align-items: flex-end; gap: 8px; }
+  .msg-row { display: flex; align-items: flex-start; gap: 10px; animation: fadeIn 0.18s ease-out; }
   .msg-row.user { flex-direction: row-reverse; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
   .avatar {
-    width: 26px; height: 26px; border-radius: 50%;
-    flex-shrink: 0;
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono); font-size: 11px; font-weight: 700; color: white;
+    font-family: var(--mono); font-size: 10.5px; font-weight: 700; color: white;
   }
   .avatar.bot { background: var(--ink); }
   .avatar.user { background: var(--amber-deep); }
-  .msg { max-width: 78%; padding: 9px 12px; line-height: 1.5; word-wrap: break-word; animation: fadeIn 0.18s ease-out; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-  .msg.user { background: var(--ink); color: var(--paper); border-radius: 10px 10px 2px 10px; }
-  .msg.bot { background: var(--paper); border: 1px solid var(--line); border-radius: 10px 10px 10px 2px; }
-  .typing-dots { display: inline-flex; gap: 3px; padding: 4px 2px; }
+  .bubble { max-width: 82%; padding: 10px 14px; line-height: 1.55; font-size: 14.5px; }
+  .bubble.user { background: var(--ink); color: var(--paper); border-radius: 12px 12px 2px 12px; }
+  .bubble.bot { background: var(--paper); border: 1px solid var(--line); border-radius: 12px 12px 12px 2px; }
+  .bubble.bot a { color: var(--amber-deep); font-weight: 700; }
+  .bubble.bot p { margin: 0 0 8px; }
+  .bubble.bot p:last-child { margin-bottom: 0; }
+  .bubble.bot ul { margin: 4px 0 8px; padding-left: 18px; }
+  .bubble.bot ul:last-child { margin-bottom: 0; }
+  .bubble.bot li { margin-bottom: 3px; }
+  .typing-dots { display: inline-flex; gap: 3px; padding: 2px; }
   .typing-dots span {
     width: 6px; height: 6px; border-radius: 50%; background: var(--ink-soft);
     animation: typingBounce 1.1s infinite ease-in-out;
@@ -190,35 +137,40 @@
   .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
   .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
   @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-4px); opacity: 1; } }
-  #naila-footer-badge {
-    text-align: center; font-family: var(--mono); font-size: 9.5px; color: var(--ink-soft);
-    padding: 5px; border-top: 1px solid var(--line); letter-spacing: 0.3px;
+
+  #powered-badge {
+    text-align: center; font-family: var(--mono); font-size: 10px; color: var(--ink-soft);
+    letter-spacing: 0.3px; margin-top: -34px; margin-bottom: 48px;
   }
-  .msg.bot a { color: var(--amber-deep); font-weight: 700; }
-  .msg.bot p { margin: 0 0 8px; }
-  .msg.bot p:last-child { margin-bottom: 0; }
-  .msg.bot ul { margin: 4px 0 8px; padding-left: 20px; }
-  .msg.bot ul:last-child { margin-bottom: 0; }
-  .msg.bot li { margin-bottom: 3px; }
-  #naila-inputrow {
-    display: flex;
-    border-top: 1px solid var(--line);
+
+  main.catalog-section { max-width: 1040px; margin: 0 auto; padding: 0 48px 100px; }
+  .section-label { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; color: var(--amber-deep); margin-bottom: 12px; }
+  h2 { font-size: 24px; margin: 0 0 24px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); padding: 16px;
+    transition: border-color 0.15s, transform 0.1s; display: block; text-decoration: none; color: inherit; cursor: pointer;
   }
-  #naila-input {
-    flex: 1;
-    border: none;
-    padding: 12px;
-    font-family: Georgia, serif;
-    font-size: 14px;
-    outline: none;
+  .card:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .card .sku { font-family: var(--mono); font-size: 10.5px; color: var(--ink-soft); }
+  .card h3 { font-size: 15px; margin: 6px 0 6px; }
+  .card .price { font-family: var(--mono); font-weight: 700; color: var(--amber-deep); }
+  .card .goto { font-family: var(--mono); font-size: 9.5px; color: var(--ink-soft); margin-top: 6px; }
+  .grid .loading { grid-column: 1 / -1; font-family: var(--mono); color: var(--ink-soft); font-size: 13px; }
+
+  footer { border-top: 3px solid var(--ink); padding: 22px 48px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); text-align: center; }
+
+  @media (max-width: 720px) {
+    header { padding: 16px 20px; }
+    header nav { gap: 14px; }
+    .ask-hero { padding: 40px 20px 28px; }
+    .ask-hero h1 { font-size: 26px; }
+    main.catalog-section { padding: 0 20px 80px; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    footer { padding: 16px 20px; font-size: 10px; }
   }
-  #naila-send {
-    border: none;
-    background: var(--amber-deep);
-    color: white;
-    padding: 0 18px;
-    font-family: var(--mono);
-    cursor: pointer;
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -226,25 +178,39 @@
 
 <header>
   <div class="brand">POLA<span>STORE</span></div>
-  <nav>CATÁLOGO<span>PEDIDOS</span><span>SOPORTE</span></nav>
+  <nav>
+    <button id="nav-catalogo">CATÁLOGO</button>
+    <button id="nav-pedidos">PEDIDOS</button>
+    <button id="nav-soporte">SOPORTE</button>
+  </nav>
 </header>
 
-<main>
-  <section class="hero">
-    <div>
-      <div class="tag">DEMO — NAILA integrado</div>
-      <h1>Tecnología y multimedia, sin vueltas.</h1>
-      <p>Tarjetas gráficas, unidades de video y clásicos en DVD. Este escaparate corre sobre osCommerce v2.3.4 — el mismo sistema legacy usado como caso de estudio en la tesis NAILA.</p>
-    </div>
-    <div class="hero-panel">
-      <div class="row"><span>SISTEMA</span><span>osCommerce 2.3.4</span></div>
-      <div class="row"><span>AGENTE</span><span>Qwen3.5-9B (local)</span></div>
-      <div class="row"><span>ARQUITECTURA</span><span>ACL + Adapter</span></div>
-      <div class="row"><span>ESTADO</span><span>● en línea</span></div>
-    </div>
-  </section>
+<section class="ask-hero">
+  <div class="tag">NAILA — Arquitectura de integración con IA</div>
+  <h1>¿Qué necesitas hoy?</h1>
+  <p class="sub">Pregunta por productos, pedidos o políticas de la tienda. Te respondemos con datos reales de Pola Store.</p>
 
-  <div class="section-label">CATÁLOGO — EN VIVO DESDE OSCOMMERCE</div>
+  <form id="ask-form">
+    <div class="icon-n">N</div>
+    <input id="ask-input" type="text" placeholder="Ej: ¿qué productos tienen disponibles?" autocomplete="off" />
+    <button id="ask-submit" type="submit">Preguntar</button>
+  </form>
+
+  <div class="suggestions">
+    <button class="chip" data-q="¿qué productos tienen disponibles?">Ver productos disponibles</button>
+    <button class="chip" data-q="¿cuál es el estado del pedido número 1?">Estado de un pedido</button>
+    <button class="chip" data-q="¿hacen envíos internacionales?">Política de envíos</button>
+    <button class="chip" data-q="¿cómo puedo contactar soporte?">Contacto y soporte</button>
+  </div>
+</section>
+
+<div id="conversation-wrap">
+  <div id="conversation"></div>
+  <div id="powered-badge">Impulsado por la arquitectura NAILA — Investigación en Ingeniería de Software, UMB</div>
+</div>
+
+<main class="catalog-section">
+  <div class="section-label" id="catalogo">CATÁLOGO — EN VIVO DESDE OSCOMMERCE</div>
   <h2>Disponible ahora en tienda</h2>
   <div class="grid" id="catalogo-grid">
     <div class="loading">Cargando catálogo real desde osCommerce...</div>
@@ -253,22 +219,26 @@
 
 <footer>POLA STORE — DEMO ACADÉMICO PARA TESIS NAILA — NO ES UN SITIO DE COMPRA REAL</footer>
 
-<!-- Widget NAILA -->
-<button id="naila-launcher" title="Pregúntale a Pola Store">💬</button>
-<div id="naila-panel">
-  <div id="naila-header"><span><span class="dot"></span>Asistente Pola Store</span><span style="opacity:0.6; font-size: 11px;">NAILA</span></div>
-  <div id="naila-messages"></div>
-  <div id="naila-footer-badge">Impulsado por la arquitectura NAILA — Investigación en Ingeniería de Software, UMB</div>
-  <div id="naila-inputrow">
-    <input id="naila-input" type="text" placeholder="Escribe tu pregunta..." />
-    <button id="naila-send">Enviar</button>
-  </div>
-</div>
-
 <script>
   const NAILA_BACKEND = "http://localhost:8000";
 
-  // ---------- Catálogo real, clicable, con link a la página real del producto ----------
+  document.getElementById('nav-catalogo').addEventListener('click', () => {
+    document.getElementById('catalogo').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  document.getElementById('nav-pedidos').addEventListener('click', () => {
+    prellenarBusqueda('¿cuál es el estado de mi pedido?');
+  });
+  document.getElementById('nav-soporte').addEventListener('click', () => {
+    prellenarBusqueda('¿cómo puedo contactar soporte?');
+  });
+
+  function prellenarBusqueda(texto) {
+    const input = document.getElementById('ask-input');
+    input.value = texto;
+    document.querySelector('.ask-hero').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    input.focus();
+  }
+
   async function cargarCatalogo() {
     const grid = document.getElementById('catalogo-grid');
     try {
@@ -298,44 +268,24 @@
   }
   cargarCatalogo();
 
-  // ---------- Widget de chat ----------
-  const launcher = document.getElementById('naila-launcher');
-  const panel = document.getElementById('naila-panel');
-  const messages = document.getElementById('naila-messages');
-  const input = document.getElementById('naila-input');
-  const sendBtn = document.getElementById('naila-send');
+  const form = document.getElementById('ask-form');
+  const input = document.getElementById('ask-input');
+  const submitBtn = document.getElementById('ask-submit');
+  const wrap = document.getElementById('conversation-wrap');
+  const conversation = document.getElementById('conversation');
 
-  launcher.addEventListener('click', () => {
-    panel.classList.toggle('open');
-    if (panel.classList.contains('open') && messages.children.length === 0) {
-      addMessage('Hola 👋 Puedo ayudarte a consultar productos disponibles o el estado de un pedido. ¿Qué necesitas?', 'bot', true);
-    }
-  });
-
-  // Renderizador de Markdown ligero: soporta [texto](url) y listas con viñetas (- o *)
   function renderMarkdownLite(text) {
-    // Escapar HTML primero, por seguridad
-    let escaped = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-
-    // Extraer links markdown [texto](url) a placeholders, para no chocar
-    // con el auto-linkeo de URLs sueltas que corre después
+    let escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const anchors = [];
     escaped = escaped.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (m, label, url) => {
       const clean = url.replace(/[.,;)]+$/, "");
       anchors.push(`<a href="${clean}" target="_blank" rel="noopener">${label}</a>`);
       return `\u0000${anchors.length - 1}\u0000`;
     });
-
-    // Auto-linkear cualquier URL suelta restante (fallback, por si el modelo no usa el formato)
     escaped = escaped.replace(/(https?:\/\/[^\s<]+)/g, (url) => {
       const clean = url.replace(/[.,;)]+$/, "");
       return `<a href="${clean}" target="_blank" rel="noopener">${clean}</a>`;
     });
-
-    // Convertir líneas "- item" o "* item" en listas <ul><li>
     const lines = escaped.split("\n");
     let html = "";
     let inList = false;
@@ -351,8 +301,6 @@
       }
     }
     if (inList) html += "</ul>";
-
-    // Restaurar los links markdown desde los placeholders
     html = html.replace(/\u0000(\d+)\u0000/g, (m, i) => anchors[parseInt(i)]);
     return html;
   }
@@ -360,45 +308,35 @@
   function addMessage(text, cls, asHtml = false) {
     const row = document.createElement('div');
     row.className = 'msg-row ' + cls;
-
     const avatar = document.createElement('div');
     avatar.className = 'avatar ' + cls;
     avatar.textContent = cls === 'user' ? 'TÚ' : 'N';
-
     const bubble = document.createElement('div');
-    bubble.className = 'msg ' + cls;
-    if (asHtml) {
-      bubble.innerHTML = renderMarkdownLite(text);
-    } else {
-      bubble.textContent = text;
-    }
-
+    bubble.className = 'bubble ' + cls;
+    if (asHtml) { bubble.innerHTML = renderMarkdownLite(text); } else { bubble.textContent = text; }
     row.appendChild(avatar);
     row.appendChild(bubble);
-    messages.appendChild(row);
-    messages.scrollTop = messages.scrollHeight;
+    conversation.appendChild(row);
+    conversation.scrollTop = conversation.scrollHeight;
     return row;
   }
 
   function addTypingIndicator() {
     const row = document.createElement('div');
     row.className = 'msg-row bot';
-    row.innerHTML = `
-      <div class="avatar bot">N</div>
-      <div class="msg bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>
-    `;
-    messages.appendChild(row);
-    messages.scrollTop = messages.scrollHeight;
+    row.innerHTML = `<div class="avatar bot">N</div><div class="bubble bot"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+    conversation.appendChild(row);
+    conversation.scrollTop = conversation.scrollHeight;
     return row;
   }
 
-  async function enviarMensaje() {
-    const texto = input.value.trim();
+  async function preguntar(texto) {
     if (!texto) return;
+    wrap.classList.add('active');
     addMessage(texto, 'user');
     input.value = '';
     input.disabled = true;
-    sendBtn.disabled = true;
+    submitBtn.disabled = true;
     const pending = addTypingIndicator();
 
     try {
@@ -412,16 +350,23 @@
       addMessage(data.reply || '(sin respuesta)', 'bot', true);
     } catch (err) {
       pending.remove();
-      addMessage('No se pudo conectar con el servidor NAILA. ¿Está corriendo en localhost:8000?', 'bot');
+      addMessage('No se pudo conectar con el servidor NAILA. Verifica que el backend esté corriendo en localhost:8000.', 'bot');
     } finally {
       input.disabled = false;
-      sendBtn.disabled = false;
+      submitBtn.disabled = false;
       input.focus();
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 
-  sendBtn.addEventListener('click', enviarMensaje);
-  input.addEventListener('keydown', (e) => { if (e.key === 'Enter') enviarMensaje(); });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    preguntar(input.value.trim());
+  });
+
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => preguntar(chip.dataset.q));
+  });
 </script>
 
 </body>
