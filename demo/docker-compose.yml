@@ -1,0 +1,34 @@
+version: "3.8"
+
+# NAILA - Demo empaquetado
+#
+# Requisito previo: osCommerce debe estar corriendo por separado
+#   (cd ../../casos-estudio/oscommerce && docker-compose up -d)
+# y Ollama debe estar corriendo en el host, con el modelo qwen3.5:9b descargado.
+#
+# Uso: docker-compose up --build
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      # host.docker.internal permite que el contenedor alcance servicios
+      # que corren en el host (Ollama, y el puerto publicado de MySQL de
+      # osCommerce), sin necesidad de compartir la red de otro proyecto Docker.
+      OLLAMA_URL: "http://host.docker.internal:11434/api/chat"
+      MYSQL_HOST: "host.docker.internal"
+      STORE_BASE_URL: "http://localhost:8080"
+      MODEL_NAME: "qwen3.5:9b"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend

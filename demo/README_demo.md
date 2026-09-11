@@ -23,7 +23,27 @@ Un visitante de una tienda (simulada) puede preguntarle al asistente, en lenguaj
 
 ## Cómo levantarlo
 
-Requisitos previos: Docker Desktop, Ollama con `qwen3.5:9b` descargado, Python 3.11+.
+### Opción A — Con Docker (recomendado, un solo comando)
+
+Requisitos previos: Docker Desktop, Ollama con `qwen3.5:9b` descargado, osCommerce corriendo.
+
+```powershell
+# 1. Levantar osCommerce (si no está corriendo)
+cd casos-estudio/oscommerce
+docker-compose up -d
+
+# 2. Levantar el demo completo (backend + frontend)
+cd ../../demo
+docker-compose up --build
+```
+
+Listo. Abre `http://localhost:3000` en el navegador.
+
+**Nota técnica:** el backend contenerizado se conecta a MySQL y a Ollama (que corren en tu máquina, fuera de Docker) mediante `host.docker.internal`, el nombre especial que Docker Desktop usa para referirse al host — no requiere que compartas redes entre proyectos de Docker distintos.
+
+### Opción B — Ejecución nativa (sin Docker, para desarrollo/debug)
+
+Requisitos previos: Docker Desktop (solo para osCommerce), Ollama con `qwen3.5:9b` descargado, Python 3.11+.
 
 ```powershell
 # 1. Levantar osCommerce (si no está corriendo)
@@ -34,7 +54,7 @@ docker-compose up -d
 cd ../../demo/backend
 python -m venv venv
 .\venv\Scripts\activate
-pip install fastapi uvicorn requests pymysql
+pip install -r requirements.txt
 uvicorn app:app --reload --port 8000
 
 # 3. Abrir el frontend
@@ -62,7 +82,8 @@ La contribución académica no es "el chat" (una capacidad ya comercialmente dis
 
 - Corre en `localhost`, sin autenticación ni HTTPS — no apto para exposición pública tal cual
 - El modelo local (Qwen3.5-9B) puede, ocasionalmente, no seguir el formato de respuesta solicitado (limitación de confiabilidad de salida estructurada en modelos pequeños, documentada en la investigación)
-- Solo soporta operaciones de lectura (consultar productos y pedidos) — no escritura (crear/modificar)
+- Solo soporta operaciones de lectura (consultar productos, pedidos y políticas) — no escritura (crear/modificar)
+- **No es un producto "instalable en cualquier negocio sin código"**: el empaquetado Docker facilita el despliegue de *este* demo específico (osCommerce), pero cada nuevo sistema legacy requiere escribir su propia ACL/Adapter siguiendo el patrón NAILA (ver `documentos-tesis/guia-generalizacion-naila.md`) — no es una integración sin código, es un patrón arquitectónico reutilizable que reduce el esfuerzo de esa integración, no lo elimina
 
 ## Autor
 

@@ -26,10 +26,16 @@ sys.path.insert(0, os.path.join(
     "..", "..", "casos-estudio", "oscommerce", "integracion-naila"
 ))
 from oscommerce_adapter import OsCommerceAdapter, TOOL_DEFINITIONS
+from oscommerce_acl import OsCommerceACL
 
-OLLAMA_URL = "http://localhost:11434/api/chat"
-MODEL_NAME = "qwen3.5:9b"
-STORE_BASE_URL = "http://localhost:8080"
+# Configuración externalizada vía variables de entorno (para poder contenerizar
+# el backend sin depender de "localhost", que dentro de un contenedor apunta
+# al contenedor mismo, no al host). Los defaults preservan el comportamiento
+# original para ejecución nativa (sin Docker).
+OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434/api/chat")
+MODEL_NAME = os.environ.get("MODEL_NAME", "qwen3.5:9b")
+STORE_BASE_URL = os.environ.get("STORE_BASE_URL", "http://localhost:8080")
+MYSQL_HOST = os.environ.get("MYSQL_HOST", "localhost")
 OLLAMA_TIMEOUT = 40  # segundos
 
 app = FastAPI(title="NAILA Chat Demo")
@@ -42,6 +48,11 @@ app.add_middleware(
 )
 
 adapter = OsCommerceAdapter()
+# Reasignación del ACL con el host configurable, SIN modificar oscommerce_adapter.py
+# ni oscommerce_acl.py (archivos ya medidos empíricamente en las Fases 4-5).
+# Esto es composición externa legítima: se sustituye el atributo público .acl
+# después de construir el Adapter con su comportamiento original intacto.
+adapter.acl = OsCommerceACL(host=MYSQL_HOST)
 
 # --- Herramienta adicional (capa de demo, no forma parte de lo medido empíricamente) ---
 # Permite responder preguntas frecuentes de la tienda con datos reales de un

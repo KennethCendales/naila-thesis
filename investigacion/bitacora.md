@@ -361,6 +361,22 @@
 
 ---
 
+## Fase 7 (continuación) — Empaquetado Docker del demo
+
+**Objetivo del día:** Reducir la fricción de instalación del demo a un solo comando, y aclarar honestamente los límites de "distribución como producto".
+
+**Tareas realizadas:**
+- Descubrimiento técnico: `OsCommerceAdapter` (código medido) no acepta configuración de conexión — bloquea la contenerización directa sin tocar archivos ya medidos.
+- Solución vía composición externa: reasignación de `adapter.acl` en la capa de demo (`app.py`), con configuración externalizada por variables de entorno (`OLLAMA_URL`, `MYSQL_HOST`, `STORE_BASE_URL`, `MODEL_NAME`) — sin modificar `oscommerce_adapter.py` ni `oscommerce_acl.py`.
+- `Dockerfile` para backend (Python/FastAPI) y frontend (nginx sirviendo el HTML estático).
+- `docker-compose.yml` del demo, usando `host.docker.internal` para alcanzar Ollama y MySQL (que corren en el host, fuera de Docker) sin acoplar la red del demo a la de osCommerce.
+- README del demo actualizado con instrucciones de un solo comando (`docker-compose up --build`), preservando también la opción de ejecución nativa para desarrollo/debug.
+- **Aclaración importante agregada al README y a ADR-009**: el empaquetado facilita el *despliegue* de esta integración específica, no convierte a NAILA en un producto "sin código, instalable en cualquier sistema legacy" — cada sistema nuevo requiere su propia ACL/Adapter siguiendo el patrón.
+
+**Estado:** ✅ Empaquetado Docker completo, documentado en ADR-009, listo para probar.
+
+---
+
 ## Plantilla para los próximos días
 
 ```markdown

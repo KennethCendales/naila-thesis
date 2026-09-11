@@ -170,6 +170,28 @@
 
 ---
 
+## ADR-009 — Empaquetado Docker del demo mediante composición externa, sin modificar código medido
+
+**Fecha:** Fase 7 (continuación)
+**Estado:** Aceptada
+
+**Contexto:** Se buscó reducir la fricción de instalación del demo (de ~8 pasos manuales a un solo comando), contenerizando el backend y el frontend.
+
+**Problema:** `OsCommerceAdapter.__init__()` (código ya medido empíricamente en las Fases 4-5) instancia `OsCommerceACL()` sin parámetros, asumiendo siempre `host="localhost"`. Dentro de un contenedor Docker, `localhost` apunta al contenedor mismo, no al host donde corren MySQL (vía osCommerce) y Ollama — por lo que contenerizar el backend tal cual rompería la conexión.
+
+**Decisión:** En la capa de demo (`app.py`, nunca en los archivos medidos), se reasigna el atributo público `adapter.acl` después de construir el `Adapter`, con una nueva instancia de `OsCommerceACL` configurada vía variable de entorno (`MYSQL_HOST`). De forma similar, se externalizaron `OLLAMA_URL`, `STORE_BASE_URL` y `MODEL_NAME` como variables de entorno con defaults que preservan el comportamiento original en ejecución nativa. El contenedor del backend usa `host.docker.internal` (mecanismo nativo de Docker Desktop) para alcanzar servicios corriendo en el host, evitando la necesidad de compartir redes Docker entre el proyecto de osCommerce y el del demo.
+
+**Alternativas consideradas:**
+- Modificar `OsCommerceAdapter`/`OsCommerceACL` para aceptar parámetros de conexión: descartada de forma terminante — modificaría archivos ya medidos empíricamente, invalidando las métricas de mantenibilidad reportadas en las Fases 4-5.
+- `network_mode: host` en Docker: descartada por no ser confiable en Docker Desktop para Windows/Mac (solo funciona de forma nativa en Linux).
+- Unir el contenedor del demo a la red Docker del proyecto de osCommerce: descartada por acoplar innecesariamente dos proyectos de Docker Compose independientes; `host.docker.internal` logra el mismo resultado sin esa dependencia.
+
+**Consecuencias:**
+- El demo ahora se levanta con `docker-compose up --build` desde `demo/`, en vez de 6-8 pasos manuales — mejora real de experiencia de instalación para portafolio.
+- Se confirma y documenta una limitación honesta descubierta en el proceso: **NAILA no es un producto "sin código, instalable en cualquier sistema legacy"** — cada integración nueva requiere escribir su propia ACL/Adapter (ver `guia-generalizacion-naila.md`). El empaquetado Docker resuelve fricción de *despliegue* de una integración ya construida, no la *generación automática* de nuevas integraciones — una distinción que se agregó explícitamente al README del demo para evitar sobreprometer el alcance.
+
+---
+
 ## Plantilla para futuras decisiones
 
 ```markdown

@@ -51,6 +51,11 @@ naila-thesis/
 │       ├── data/                → entorno Trac
 │       ├── integracion-naila/   → Adapter + ACL ✅
 │       └── integracion-adhoc/   → baseline sin patrón ✅
+├── demo/                        → demo funcional empaquetado (docker-compose up --build)
+│   ├── backend/                 → FastAPI + Dockerfile
+│   ├── frontend/                → HTML/CSS/JS + Dockerfile (nginx)
+│   ├── docker-compose.yml
+│   └── README.md
 └── metricas/                    → scripts y resultados de medición (Fase 4)
 ```
 
