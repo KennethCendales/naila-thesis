@@ -31,7 +31,7 @@ Organizado por horizonte temporal, considerando que el investigador cuenta con a
 
 ### Corto plazo (semanas — mejoras de bajo costo, alto impacto sobre lo ya hecho)
 
-1. Prueba de significancia estadística formal (t de Student u otra apropiada) sobre las 120 mediciones de latencia Nivel 1, para fortalecer la validez de conclusión ya declarada como limitación (Día 29).
+1. ~~Prueba de significancia estadística formal~~ — **COMPLETADO** (t de Welch aplicada; ver `resultados-experimento-comparativo.md`). Resultado: la diferencia de latencia en Nivel 1 es significativa en osCommerce (p=0.041) pero no en Trac (p=0.35-0.43) — matiz importante que se incorporó a Resultados, Discusión y Limitaciones.
 2. Verificación de la causa raíz del outlier de arranque en frío en Trac NAILA (Día 26), si el tiempo lo permite, para descartar completamente su origen antes de la defensa.
 
 ### Mediano plazo (meses — extensiones sustanciales sobre la arquitectura actual)

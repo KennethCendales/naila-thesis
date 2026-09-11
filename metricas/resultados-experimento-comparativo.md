@@ -39,3 +39,29 @@ Se confirma con datos estadísticos robustos (no solo la primera corrida piloto)
 | Latencia Nivel 2 (Día 26) | Sin diferencia significativa (dominado por el LLM) |
 
 **Síntesis para la tesis:** NAILA presenta un trade-off claro y cuantificado: mejor mantenibilidad estructural a cambio de mayor esfuerzo de implementación y un costo marginal de rendimiento en la capa de integración. Ninguna de las dos versiones es objetivamente "mejor" en todas las dimensiones — la contribución de la tesis es precisamente cuantificar este trade-off con evidencia empírica, permitiendo que futuros equipos de desarrollo tomen esta decisión de forma informada según sus prioridades (mantenibilidad a largo plazo vs. velocidad de entrega y rendimiento marginal).
+
+---
+
+# Prueba de significancia estadística (t de Welch) — actualización posterior a la Fase 6
+
+> Aplicada como parte del trabajo de fortalecimiento de la tesis, siguiendo la línea de trabajo futuro de corto plazo ya identificada (`conclusiones-trabajo-futuro.md`, punto 1). Se usa la prueba t de Welch (no asume varianzas iguales entre grupos), apropiada dado que ya se había observado variabilidad muy distinta entre osCommerce y Trac.
+
+## Resultados
+
+| Comparación | Media NAILA | Media Ad hoc | t | p | Significativo (α=0.05) |
+|---|---|---|---|---|---|
+| osCommerce — Nivel 1 | 23.17 ms | 18.10 ms | 2.087 | 0.0414 | **Sí** |
+| osCommerce — Nivel 2 | 5335.72 ms | 5400.89 ms | -0.377 | 0.7078 | No |
+| Trac — Nivel 1 (con outlier) | 1.16 ms | 0.86 ms | 0.948 | 0.3510 | No |
+| Trac — Nivel 1 (sin outlier) | 0.85 ms | 0.86 ms | -0.798 | 0.4287 | No |
+| Trac — Nivel 2 | 5532.12 ms | 5471.13 ms | 0.385 | 0.7016 | No |
+
+## Interpretación — matiz importante frente a las secciones previas de Resultados y Discusión
+
+**La diferencia de latencia en Nivel 1 (ad hoc más rápido que NAILA) solo alcanza significancia estadística en osCommerce, no en Trac.** Esto refina — no invalida — el hallazgo original: el costo de rendimiento de la separación arquitectónica (Adapter → ACL) es real y medible cuando la latencia base del sistema legacy es suficientemente alta (osCommerce, con conexión de red a MySQL), pero se diluye en el ruido de medición cuando la latencia base es extremadamente baja (Trac, acceso directo a archivo SQLite, latencias sub-milisegundo).
+
+**Todas las comparaciones de Nivel 2 confirman, ahora con respaldo estadístico formal, lo que ya se argumentaba cualitativamente**: no hay diferencia distinguible entre NAILA y ad hoc a nivel de sistema completo — el ruido de la inferencia del LLM domina por completo cualquier señal arquitectónica.
+
+## Consecuencia para el texto de la tesis
+
+Las secciones `resultados-tesis.md`, `discusion-tesis.md` y `limitaciones-tesis.md` deben actualizarse para reflejar este matiz: el trade-off de rendimiento es real y significativo en al menos un caso de estudio (osCommerce), pero no se generaliza automáticamente a cualquier sistema legacy — depende de la magnitud de la latencia base del sistema, un hallazgo en sí mismo relevante para la guía de generalización de NAILA.
