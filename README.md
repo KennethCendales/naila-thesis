@@ -4,6 +4,12 @@
 
 **Autor:** Kenneth Cendales — Universidad Manuela Beltrán
 
+## Por qué existe esta investigación
+
+El origen de esta investigación no es anecdótico. A nivel global, los sistemas legacy sostienen el 70% de las operaciones críticas de negocio, según datos citados de Hashbyt (2026), y en muchas organizaciones hasta el 75% del gasto tecnológico se destina únicamente a mantenerlos funcionando, sin poder invertir en evolucionarlos. En Colombia, el propio Ministerio TIC reconoce la infraestructura tecnológica obsoleta como una barrera institucional para la transformación digital en su Marco de la Transformación Digital para el Estado Colombiano, y estudios empíricos en universidades colombianas —incluyendo encuestas directas a pymes— documentan esa misma limitación como un obstáculo real y medido, no supuesto. Ese es el problema documentado del que parte NAILA: reemplazar un sistema legacy es costoso y riesgoso, una realidad reconocida institucional y académicamente, no descubierta por intuición personal.
+
+La valía de esta tesis no está en construir un chat con IA —esa es una capacidad comercial ya saturada, sin novedad investigativa por sí sola— sino en resolver ese problema documentado con rigor de Ingeniería de Software. NAILA es una arquitectura de integración (Anti-Corruption Layer + Adapter) validada empíricamente sobre dos sistemas legacy reales y heterogéneos, que cuantifica, no solo afirma, el trade-off real entre mantenibilidad, esfuerzo de implementación y rendimiento al adoptarla frente a integrar sin arquitectura. Ninguna solución comercial de chat con IA publica ni sustenta con evidencia esa relación costo-beneficio de su propia arquitectura interna; esta investigación sí. Esa es la diferencia real: no es la interfaz conversacional, es la arquitectura validada detrás de ella y la evidencia empírica —estadísticamente confirmada, con limitaciones declaradas con honestidad— que la respalda.
+
 ## Resumen
 
 NAILA propone y valida empíricamente una arquitectura (Anti-Corruption Layer + Adapter/API Facade) para incorporar agentes de IA generativa como capa de interacción en lenguaje natural sobre sistemas de software heredados, sin modificar su lógica de negocio. Se evalúa mediante dos casos de estudio (osCommerce v2.3.4 y Trac), comparando la arquitectura propuesta frente a una integración ad hoc mínima viable, en las dimensiones de mantenibilidad y eficiencia de desempeño (ISO/IEC 25010).

@@ -14,6 +14,11 @@ services:
       context: ./backend
     ports:
       - "8000:8000"
+    volumes:
+      # Monta (no copia) el Adapter/ACL ya medidos empíricamente, para que el
+      # contenedor use exactamente los mismos archivos del repositorio -
+      # sin duplicarlos dentro de la imagen Docker.
+      - ../casos-estudio/oscommerce/integracion-naila:/casos-estudio/oscommerce/integracion-naila:ro
     environment:
       # host.docker.internal permite que el contenedor alcance servicios
       # que corren en el host (Ollama, y el puerto publicado de MySQL de
